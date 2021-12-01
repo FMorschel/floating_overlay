@@ -1,0 +1,24 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    always_declare_return_types: true
+    always_require_non_null_named_parameters: true
+    implicit-casts: true
+    implicit-dynamics: true
+    prefer_final_in_for_each: true
+    prefer_final_locals: true
+    prefer_function_declarations_over_variables: true
+    prefer_is_empty: true
+    prefer_is_not_empty: true
+    prefer_relative_imports: true
+    require_trailing_commas: true
+    sort_constructors_first: true
+    sort_unnamed_constructors_first: true
+    unnecessary_new: true
+    prefer_void_to_null: true
+    void_checks: true
+
+analyzer:
+  errors:
+    missing_required_param: error
