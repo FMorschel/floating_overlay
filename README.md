@@ -1,21 +1,14 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
-
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
 A widget wrapper that allows a floating widget be dragged and rescaled.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- Floating widget on top of the screen
+- Resizing and repositioning the floating widget
+- Constrainable space to float inside the tree (optional)
+- Limiting borders with padding
+- State managment when pushing and poping screens (needs the RouteObserver for managing push)
+
+![FloatingOverlay](https://user-images.githubusercontent.com/52160996/144409885-bbb6e850-c570-4c81-a920-12a08183449d.gif)
 
 ## Getting started
 
