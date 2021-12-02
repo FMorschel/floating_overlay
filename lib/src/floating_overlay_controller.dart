@@ -56,16 +56,6 @@ class FloatingOverlayController {
   OverlayEntry? _entry;
   Widget? _child;
 
-  // Toggles the floating child's visibility.
-  void toggle() {
-    _logger.info('Toggled');
-    if (isFloating) {
-      hide();
-    } else {
-      show();
-    }
-  }
-
   void _initState(
     BuildContext context,
     Widget floatingChild,
@@ -78,13 +68,20 @@ class FloatingOverlayController {
     _overlay = Overlay.of(context);
   }
 
-  // The floating child's visibility.
-  bool get isFloating => _entry != null;
-
   void _dispose() {
     hide();
     _overlay?.dispose();
     _logger.info('Disposed');
+  }
+
+  // Toggles the floating child's visibility.
+  void toggle() {
+    _logger.info('Toggled');
+    if (isFloating) {
+      hide();
+    } else {
+      show();
+    }
   }
 
   // Hides the floating child.
@@ -93,6 +90,10 @@ class FloatingOverlayController {
     _entry = null;
     _logger.info('Hidden overlay');
   }
+
+  // The floating child's visibility.
+  bool get isFloating => _entry != null;
+
 
   // Shows the floating child.
   void show() {
