@@ -1,7 +1,7 @@
 part of 'floating_overlay.dart';
 
-class FloatingOverlayOffset extends Cubit<Offset> {
-  FloatingOverlayOffset(Offset? initialState, [EdgeInsets? padding])
+class _FloatingOverlayOffset extends Cubit<Offset> {
+  _FloatingOverlayOffset(Offset? initialState, [EdgeInsets? padding])
       : _padding = padding ?? EdgeInsets.zero,
         _constrainedPadding = padding ?? EdgeInsets.zero,
         _previousOffset = initialState ?? Offset.zero,

@@ -2,40 +2,61 @@ part of 'floating_overlay.dart';
 
 class FloatingOverlayController {
   FloatingOverlayController.relativeSize({
+    /// Minimum scale to resize the floating child.
     double? minScale,
+
+    /// Maximum scale to resize the floating child.
     double? maxScale,
+
+    /// Padding inside the constraints of the floating child's space to float.
     EdgeInsets? padding,
+
+    /// Offset inside the constraints of the floating child's space to float.
     Offset? start,
+
+    /// If the floating child's space to float will be limited by the maximum
+    /// size that the FloatingOverlay can be.
     bool? constrained,
-  })  : _offset = FloatingOverlayOffset(start, padding),
+  })  : _offset = _FloatingOverlayOffset(start, padding),
         _constrained = constrained ?? false,
-        _scale = FloatingOverlayScale.relative(
+        _scale = _FloatingOverlayScale.relative(
           minScale: minScale,
           maxScale: maxScale,
         );
 
   FloatingOverlayController.absoluteSize({
+    /// Minimum size to resize the floating child.
     Size? minSize,
+
+    /// Maximum size to resize the floating child.
     Size? maxSize,
+
+    /// Padding inside the constraints of the floating child's space to float.
     EdgeInsets? padding,
+
+    /// Offset inside the constraints of the floating child's space to float.
     Offset? start,
+
+    /// If the floating child's space to float will be limited by the maximum
+    /// size that the FloatingOverlay can be.
     bool? constrained,
-  })  : _offset = FloatingOverlayOffset(start, padding),
+  })  : _offset = _FloatingOverlayOffset(start, padding),
         _constrained = constrained ?? false,
-        _scale = FloatingOverlayScale.absolute(
+        _scale = _FloatingOverlayScale.absolute(
           maxSize: maxSize,
           minSize: minSize,
         );
 
   static final _logger = Logger('FloatingOverlayController');
-  final FloatingOverlayOffset _offset;
-  final FloatingOverlayScale _scale;
-  final GlobalKey key = GlobalKey();
+  final _FloatingOverlayOffset _offset;
+  final _FloatingOverlayScale _scale;
+  final _key = GlobalKey();
   final bool _constrained;
   OverlayState? _overlay;
   OverlayEntry? _entry;
   Widget? _child;
 
+  // Toggles the floating child's visibility.
   void toggle() {
     _logger.info('Toggled');
     if (isFloating) {
@@ -45,7 +66,7 @@ class FloatingOverlayController {
     }
   }
 
-  void initState(
+  void _initState(
     BuildContext context,
     Widget floatingChild,
     EdgeInsets newPadding,
@@ -57,20 +78,23 @@ class FloatingOverlayController {
     _overlay = Overlay.of(context);
   }
 
+  // The floating child's visibility.
   bool get isFloating => _entry != null;
 
-  void dispose() {
+  void _dispose() {
     hide();
     _overlay?.dispose();
     _logger.info('Disposed');
   }
 
+  // Hides the floating child.
   void hide() {
     _entry?.remove();
     _entry = null;
     _logger.info('Hidden overlay');
   }
 
+  // Shows the floating child.
   void show() {
     _logger.info('Showing overlay');
     _entry = OverlayEntry(
@@ -93,14 +117,14 @@ class FloatingOverlayController {
                     alignment: Alignment.topLeft,
                     transform: Matrix4.diagonal3(vector),
                     child: GestureDetector(
-                      key: key,
+                      key: _key,
                       onScaleStart: (_) {
                         _scale.onStart();
-                        _offset.onStart(key, scale);
+                        _offset.onStart(_key, scale);
                       },
                       onScaleUpdate: (details) {
-                        _scale.onUpdate(details, key);
-                        _offset.onUpdate(details.delta, key, scale);
+                        _scale.onUpdate(details, _key);
+                        _offset.onUpdate(details.delta, _key, scale);
                       },
                       child: _child,
                     ),

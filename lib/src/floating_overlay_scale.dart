@@ -1,7 +1,7 @@
 part of 'floating_overlay.dart';
 
-class FloatingOverlayScale extends Cubit<double> {
-  FloatingOverlayScale.relative({
+class _FloatingOverlayScale extends Cubit<double> {
+  _FloatingOverlayScale.relative({
     double? minScale,
     double? maxScale,
   })  : _minScale = minScale ?? 1.0,
@@ -10,7 +10,7 @@ class FloatingOverlayScale extends Cubit<double> {
         _minSize = null,
         super(1.0);
 
-  FloatingOverlayScale.absolute({
+  _FloatingOverlayScale.absolute({
     Size? minSize,
     Size? maxSize,
   })  : _maxSize = maxSize,

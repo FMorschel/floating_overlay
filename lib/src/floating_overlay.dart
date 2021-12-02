@@ -12,15 +12,34 @@ part 'floating_overlay_scale.dart';
 class FloatingOverlay extends StatefulWidget {
   const FloatingOverlay({
     Key? key,
+
+    /// The child underneath this widget inside the widget tree.
     this.child,
+
+    /// Used to controll the visibility state of the [floatingChild].
     this.controller,
+
+    /// Widget that will be floating around.
     this.floatingChild,
+
+    /// When you push pages on top, the floating child will vanish and reappear
+    /// when you return if you give it an RouteObserver linked to the main
+    /// MaterialApp.
     this.routeObserver,
   }) : super(key: key);
 
+  /// The child underneath this widget inside the widget tree.
   final Widget? child;
+
+  /// Widget that will be floating around.
   final Widget? floatingChild;
+
+  /// Used to controll the visibility state of the [floatingChild].
   final FloatingOverlayController? controller;
+
+  /// When you push pages on top, the floating child will vanish and reappear
+  /// when you return if you give it an RouteObserver linked to the main
+  /// MaterialApp.
   final RouteObserver? routeObserver;
 
   @override
@@ -64,7 +83,7 @@ class _FloatingOverlayState extends State<FloatingOverlay> with RouteAware {
   @override
   void dispose() {
     widget.routeObserver?.unsubscribe(this);
-    controller.dispose();
+    controller._dispose();
     super.dispose();
   }
 
@@ -88,7 +107,7 @@ class _FloatingOverlayState extends State<FloatingOverlay> with RouteAware {
               screen.width - (offset.dx + constraints.maxWidth),
               screen.height - (offset.dy + constraints.maxHeight),
             );
-            controller.initState(
+            controller._initState(
               context,
               widget.floatingChild ?? empty,
               padding,

@@ -11,8 +11,7 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages). 
 -->
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+A widget wrapper that allows a floating widget be dragged and rescaled.
 
 ## Features
 
@@ -20,20 +19,73 @@ TODO: List what your package can do. Maybe include images, gifs, or videos.
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Add to your ```pubspec.yaml``` file:
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  floating_overlay: 1.0.0
+```
+
+Import the package
+
+```dart
+import 'package:floating_overlay/floating_overlay.dart';
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+Create a FloatingOverlayController
 
 ```dart
-const like = 'sample';
+final controller = FloatingOverlayController.absoluteSize(
+  maxSize: const Size(200, 200),
+  minSize: const Size(100, 100),
+  start: Offset.zero,
+  padding: const EdgeInsets.all(20.0),
+  constrained: true,
+);
 ```
 
-## Additional information
+or
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+```dart
+final controller = FloatingOverlayController.relativeSize(
+  maxScale: 2.0,
+  minScale: 1.0,
+  start: Offset.zero,
+  padding: const EdgeInsets.all(20.0),
+  constrained: true,
+);
+```
+
+Insert the FloatingOverlay widget inside your widget tree and give it the controller, a child and a floatingChild.
+
+```dart
+FloatingOverlay(
+  controller: controller,
+  floatingChild: SizedBox.square(
+    dimension: 100.0,
+    child: Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor,
+        border: Border.all(
+          color: Colors.black,
+          width: 5.0,
+        ),
+      ),
+    ),
+  ),
+  child: Container(),
+);
+```
+
+Then use the controller to make the floating child show or hide.
+
+```dart
+controller.hide();
+controller.isFloating;
+controller.show();
+controller.toggle();
+```
