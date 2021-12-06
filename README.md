@@ -18,7 +18,7 @@ Add to your ```pubspec.yaml``` file:
 dependencies:
   flutter:
     sdk: flutter
-  floating_overlay: 1.0.0
+  floating_overlay: 1.0.1
 ```
 
 Import the package
