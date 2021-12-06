@@ -1,6 +1,6 @@
 part of 'floating_overlay.dart';
 
-class FloatingOverlayController {
+class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   FloatingOverlayController.relativeSize({
     /// Minimum scale to resize the floating child.
     double? minScale,
@@ -22,6 +22,13 @@ class FloatingOverlayController {
         _scale = _FloatingOverlayScale.relative(
           minScale: minScale,
           maxScale: maxScale,
+        ),
+        super(
+          FloatingOverlayData(
+            childSize: Size.zero,
+            scale: 1.0,
+            position: _FloatingOverlayOffset(start, padding).state,
+          ),
         );
 
   FloatingOverlayController.absoluteSize({
@@ -45,6 +52,13 @@ class FloatingOverlayController {
         _scale = _FloatingOverlayScale.absolute(
           maxSize: maxSize,
           minSize: minSize,
+        ),
+        super(
+          FloatingOverlayData(
+            childSize: Size.zero,
+            scale: 1.0,
+            position: _FloatingOverlayOffset(start, padding).state,
+          ),
         );
 
   static final _logger = Logger('FloatingOverlayController');
@@ -131,7 +145,24 @@ class FloatingOverlayController {
                         _scale.onUpdate(details, _key);
                         _offset.onUpdate(details.delta, _key!, scale);
                       },
-                      child: _child,
+                      child: Builder(
+                        builder: (context) {
+                          WidgetsBinding.instance?.addPostFrameCallback((_) {
+                            final _context = _key!.currentContext!;
+                            final box =
+                                _context.findRenderObject() as RenderBox?;
+                            final childSize = box?.size;
+                            emit(
+                              FloatingOverlayData(
+                                childSize: childSize ?? Size.zero,
+                                scale: scale,
+                                position: position,
+                              ),
+                            );
+                          });
+                          return _child ?? const SizedBox.shrink();
+                        },
+                      ),
                     ),
                   );
                 },

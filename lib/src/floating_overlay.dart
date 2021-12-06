@@ -8,6 +8,7 @@ import 'package:vector_math/vector_math_64.dart' show Vector3;
 part 'floating_overlay_controller.dart';
 part 'floating_overlay_offset.dart';
 part 'floating_overlay_scale.dart';
+part 'floating_overlay_data.dart';
 
 class FloatingOverlay extends StatefulWidget {
   const FloatingOverlay({
