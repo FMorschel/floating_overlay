@@ -11,8 +11,8 @@ class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    // Create one of this and pass it to the FloatingOverlay, to be able to pop 
-    // and push new pages and the floating overlay don't continue showing in 
+    // Create one of this and pass it to the FloatingOverlay, to be able to pop
+    // and push new pages and the floating overlay don't continue showing in
     // all new pages on top and show again when you come back
     final routeObserver = RouteObserver<ModalRoute<void>>();
     return MaterialApp(
@@ -23,9 +23,9 @@ class App extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: Provider<RouteObserver>(
-        // One way to make it avaliable through all your files and pages, but 
+        // One way to make it avaliable through all your files and pages, but
         // global variables and other means will work just fine as well.
-        create: (_) => routeObserver, 
+        create: (_) => routeObserver,
         child: const HomePage(),
       ),
     );

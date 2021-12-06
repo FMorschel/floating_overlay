@@ -94,7 +94,6 @@ class FloatingOverlayController {
   // The floating child's visibility.
   bool get isFloating => _entry != null;
 
-
   // Shows the floating child.
   void show() {
     _logger.info('Showing overlay');
