@@ -47,11 +47,36 @@ class FloatingOverlay extends StatefulWidget {
 }
 
 class _FloatingOverlayState extends State<FloatingOverlay> with RouteAware {
-  static const empty = SizedBox.square(dimension: 0);
-  final key = GlobalKey();
-  late final FloatingOverlayController controller;
+  static const empty = SizedBox.shrink();
 
+  late final FloatingOverlayController controller;
+  final key = GlobalKey();
+  final floatingWidgetKey = GlobalKey();
   bool floating = false;
+
+  void startController(BuildContext context, BoxConstraints constraints) {
+    final screen = MediaQuery.of(context).size;
+    final box = key.currentContext!.findRenderObject()! as RenderBox;
+    final offset = box.localToGlobal(Offset.zero);
+    final padding = EdgeInsets.fromLTRB(
+      offset.dx,
+      offset.dy,
+      screen.width - (offset.dx + constraints.maxWidth),
+      screen.height - (offset.dy + constraints.maxHeight),
+    );
+    controller._initState(
+      context,
+      widget.floatingChild ?? empty,
+      padding,
+      floatingWidgetKey,
+    );
+  }
+
+  @override
+  void initState() {
+    controller = widget.controller ?? FloatingOverlayController.relativeSize();
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() {
@@ -75,12 +100,6 @@ class _FloatingOverlayState extends State<FloatingOverlay> with RouteAware {
   }
 
   @override
-  void initState() {
-    controller = widget.controller ?? FloatingOverlayController.relativeSize();
-    super.initState();
-  }
-
-  @override
   void dispose() {
     widget.routeObserver?.unsubscribe(this);
     controller._dispose();
@@ -97,22 +116,9 @@ class _FloatingOverlayState extends State<FloatingOverlay> with RouteAware {
       },
       child: LayoutBuilder(
         builder: (context, constraints) {
-          WidgetsBinding.instance?.addPostFrameCallback((_) {
-            final screen = MediaQuery.of(context).size;
-            final box = key.currentContext!.findRenderObject()! as RenderBox;
-            final offset = box.localToGlobal(Offset.zero);
-            final padding = EdgeInsets.fromLTRB(
-              offset.dx,
-              offset.dy,
-              screen.width - (offset.dx + constraints.maxWidth),
-              screen.height - (offset.dy + constraints.maxHeight),
-            );
-            controller._initState(
-              context,
-              widget.floatingChild ?? empty,
-              padding,
-            );
-          });
+          WidgetsBinding.instance?.addPostFrameCallback(
+            (_) => startController(context, constraints),
+          );
           return widget.child ?? empty;
         },
       ),

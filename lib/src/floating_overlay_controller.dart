@@ -50,8 +50,8 @@ class FloatingOverlayController {
   static final _logger = Logger('FloatingOverlayController');
   final _FloatingOverlayOffset _offset;
   final _FloatingOverlayScale _scale;
-  final _key = GlobalKey();
   final bool _constrained;
+  GlobalKey? _key;
   OverlayState? _overlay;
   OverlayEntry? _entry;
   Widget? _child;
@@ -60,8 +60,10 @@ class FloatingOverlayController {
     BuildContext context,
     Widget floatingChild,
     EdgeInsets newPadding,
+    GlobalKey key,
   ) {
     _logger.info('Started');
+    _key = key;
     _child = floatingChild;
     _offset.init(newPadding, _constrained);
     _offset.set(_offset.state, MediaQuery.of(context).size);
@@ -69,8 +71,10 @@ class FloatingOverlayController {
   }
 
   void _dispose() {
-    hide();
-    _overlay?.dispose();
+    hide(true);
+    _offset.close();
+    _scale.close();
+    _overlay = null;
     _logger.info('Disposed');
   }
 
@@ -85,8 +89,9 @@ class FloatingOverlayController {
   }
 
   // Hides the floating child.
-  void hide() {
+  void hide([bool dispose = false]) {
     _entry?.remove();
+    if (dispose) _entry?.dispose();
     _entry = null;
     _logger.info('Hidden overlay');
   }
@@ -120,11 +125,11 @@ class FloatingOverlayController {
                       key: _key,
                       onScaleStart: (_) {
                         _scale.onStart();
-                        _offset.onStart(_key, scale);
+                        _offset.onStart(_key!, scale);
                       },
                       onScaleUpdate: (details) {
                         _scale.onUpdate(details, _key);
-                        _offset.onUpdate(details.delta, _key, scale);
+                        _offset.onUpdate(details.delta, _key!, scale);
                       },
                       child: _child,
                     ),
