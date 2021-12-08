@@ -6,7 +6,8 @@ extension _SizeExtension on Size {
   /// e.g. this.height / other.height
   double div(Size other) {
     final infinity = double.infinity;
-    final heightScale = (other.height != 0) ? (height / other.height) : infinity;
+    final heightScale =
+        (other.height != 0) ? (height / other.height) : infinity;
     final widthScale = (other.width != 0) ? (width / other.width) : infinity;
     return (widthScale < heightScale) ? widthScale : heightScale;
   }

@@ -76,12 +76,12 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
 
     if (pixels.right > limits.right) width = limits.right - child.width;
     if (pixels.left < limits.left) width = limits.left;
-    
+
     if (pixels.bottom > limits.bottom) height = limits.bottom - child.height;
     if (pixels.top < limits.top) height = limits.top;
 
     return Offset(
-      width ?? offset.dx, 
+      width ?? offset.dx,
       height ?? offset.dy,
     );
   }

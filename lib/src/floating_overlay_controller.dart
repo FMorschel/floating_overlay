@@ -2,7 +2,7 @@ part of 'floating_overlay.dart';
 
 class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   /// The controller for the [FloatingOverlay].
-  /// 
+  ///
   /// Be sure to initialize this only once (probably inside `initState` method)
   /// when inside a Stateful Widget that has an [AnimationController] inside.
   FloatingOverlayController.relativeSize({
@@ -36,7 +36,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
         );
 
   /// The controller for the [FloatingOverlay].
-  /// 
+  ///
   /// Be sure to initialize this only once (probably inside `initState` method)
   /// when inside a Stateful Widget that has an [AnimationController] inside.
   FloatingOverlayController.absoluteSize({
@@ -150,7 +150,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _overlay?.insert(_entry!);
   }
 
-  Size get _childSize{
+  Size get _childSize {
     final _context = _key!.currentContext!;
     final box = _context.findRenderObject() as RenderBox?;
     return box?.size ?? Size.zero;

@@ -2,8 +2,8 @@ part of 'floating_overlay.dart';
 
 class _FloatingOverlayPositioned extends StatelessWidget {
   const _FloatingOverlayPositioned({
-    Key? key, 
-    required this.child, 
+    Key? key,
+    required this.child,
     required this.offsetController,
   }) : super(key: key);
 

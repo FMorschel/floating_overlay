@@ -99,7 +99,7 @@ class HomePage extends StatelessWidget {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => Provider<RouteObserver>(
-                          // There is a difference to initializing the 
+                          // There is a difference to initializing the
                           // controller inside a Stateful Widget that has an
                           // [AnimationController].
                           create: (_) => routeObserver,
@@ -147,7 +147,8 @@ class _AnimationPageState extends State<AnimationPage>
       vsync: this,
       duration: const Duration(seconds: 1),
     );
-    /// The [FloatingOverlayController] needs to be initialized only once when 
+
+    /// The [FloatingOverlayController] needs to be initialized only once when
     /// there is an [AnimationController] inside the same State.
     controller = FloatingOverlayController.absoluteSize(
       maxSize: const Size(200, 200),
