@@ -24,38 +24,32 @@ class _FloatingOverlayScale extends Cubit<double> {
   final Size? _minSize;
   final Size? _maxSize;
   double _previousScale = 1.0;
+  GlobalKey? _key;
 
-  void onStart() => _previousScale = state;
+  BuildContext? get _context => _key?.currentContext;
 
-  void onUpdate(ScaleUpdateDetails details, [GlobalKey? key]) {
-    final scale = _previousScale * details.scale;
-    final context = key?.currentContext;
-    if (context != null) {
-      final renderBox = context.findRenderObject() as RenderBox;
-      final size = renderBox.size * scale;
-      if (((_minSize != null) && (_minSize! > size)) ||
-          ((_minScale != null) && (_minScale! > scale))) {
-        emit(
-          (_minSize != null)
-              ? (_minSize!.height / renderBox.size.height)
-              : _minScale!,
-        );
-      } else if (((_maxSize != null) && (_maxSize! < size)) ||
-          ((_maxScale != null) && (_maxScale! < scale))) {
-        emit(
-          (_maxSize != null)
-              ? (_maxSize!.height / renderBox.size.height)
-              : _maxScale!,
-        );
-      } else {
-        emit(scale);
-      }
-    } else if ((_minScale ?? 1.0) > scale) {
-      emit(_minScale ?? 1.0);
-    } else if (scale > (_maxScale ?? 1.0)) {
-      emit(_maxScale ?? 1.0);
+  void onStart([GlobalKey? key]) {
+    _previousScale = state;
+    _key = key;
+  }
+
+  void onUpdate(double scale) {
+    final newScale = _previousScale * scale;
+    final minScale = _minScale ?? 1.0;
+    final maxScale = _maxScale ?? 1.0;
+    if (_context != null) {
+      final childSize = _widgetSize(_context!);
+      final minSize = _minSize ?? (childSize * minScale);
+      final maxSize = _maxSize ?? (childSize * maxScale);
+      final clampedSize = (childSize * newScale).clamp(minSize, maxSize);
+      emit(clampedSize.div(childSize));
     } else {
-      emit(scale);
+      emit(newScale.clamp(minScale, maxScale));
     }
+  }
+
+  Size _widgetSize(BuildContext context) {
+    final renderBox = context.findRenderObject() as RenderBox?;
+    return renderBox?.size ?? Size.zero;
   }
 }

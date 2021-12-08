@@ -9,6 +9,9 @@ part 'floating_overlay_controller.dart';
 part 'floating_overlay_offset.dart';
 part 'floating_overlay_scale.dart';
 part 'floating_overlay_data.dart';
+part 'floating_overlay_positioned.dart';
+part 'floating_overlay_transform.dart';
+part 'size_extension.dart';
 
 class FloatingOverlay extends StatefulWidget {
   const FloatingOverlay({

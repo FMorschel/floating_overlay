@@ -11,6 +11,8 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
   EdgeInsets _constrainedPadding;
   bool _constrained = false;
   Offset _previousOffset;
+  _FloatingOverlayScale? _scale;
+  GlobalKey? _key;
 
   void init(EdgeInsets padding, bool constrained) {
     _constrainedPadding = EdgeInsets.fromLTRB(
@@ -27,23 +29,34 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
     emit(_validValue(offset, screenSize));
   }
 
-  void onStart(GlobalKey key, double scale) => _previousOffset = state;
+  void onStart(final _FloatingOverlayScale scale, final GlobalKey key) {
+    _previousOffset = state;
+    _scale = scale;
+    _scale!.stream.listen((scale) {
+      if (_context != null) {
+        _update(scale: scale);
+      }
+    });
+    _key = key;
+  }
 
-  void onUpdate(Offset offset, GlobalKey key, double scale) {
-    final context = key.currentContext;
-    if (context != null) {
-      final screenSize = MediaQuery.of(context).size;
-      final widgetSize = _widgetSize(context);
-      emit(
-        _validValue(
-          _previousOffset + offset,
-          screenSize,
-          widgetSize * scale,
-        ),
-      );
+  BuildContext? get _context => _key?.currentContext;
+  EdgeInsets get currentPadding =>
+      _constrained ? _constrainedPadding : _padding;
+
+  void onUpdate(Offset offset) {
+    if (_context != null) {
+      _update(offset: offset);
     } else {
       emit(_previousOffset + offset);
     }
+  }
+
+  void _update({Offset? offset, double? scale}) {
+    final screenSize = MediaQuery.of(_context!).size;
+    final widgetSize = _widgetSize(_context!) * (scale ?? _scale!.state);
+    final _offset = offset == null ? state : _previousOffset + offset;
+    emit(_validValue(_offset, screenSize, widgetSize));
   }
 
   Size _widgetSize(BuildContext context) {
@@ -53,24 +66,43 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
 
   Offset _validValue(
     Offset offset,
-    Size screenSize, [
-    Size? childSize,
+    Size screen, [
+    Size child = Size.zero,
   ]) {
-    final padding = _constrained ? _constrainedPadding : _padding;
-    double width = offset.dx;
-    double height = offset.dy;
-    if ((width + (childSize?.width ?? 0)) >
-        (screenSize.width - padding.right)) {
-      width = screenSize.width - padding.right - (childSize?.width ?? 0);
-    } else if (width < padding.left) {
-      width = padding.left;
-    }
-    if ((height + (childSize?.height ?? 0)) >
-        (screenSize.height - padding.bottom)) {
-      height = screenSize.height - padding.bottom - (childSize?.height ?? 0);
-    } else if (height < padding.top) {
-      height = padding.top;
-    }
-    return Offset(width, height);
+    double? width;
+    double? height;
+    final limits = _limitsFrom(currentPadding, screen);
+    final pixels = _childPixels(offset, child);
+
+    if (pixels.right > limits.right) width = limits.right - child.width;
+    if (pixels.left < limits.left) width = limits.left;
+    
+    if (pixels.bottom > limits.bottom) height = limits.bottom - child.height;
+    if (pixels.top < limits.top) height = limits.top;
+
+    return Offset(
+      width ?? offset.dx, 
+      height ?? offset.dy,
+    );
+  }
+
+  EdgeInsets _childPixels(Offset offset, Size? size) {
+    return EdgeInsets.fromLTRB(
+      offset.dx,
+      offset.dy,
+      offset.dx + (size?.width ?? 0),
+      offset.dy + (size?.height ?? 0),
+    );
+  }
+
+  EdgeInsets _limitsFrom(EdgeInsets padding, Size size) {
+    final rightPaddding = size.width - padding.right;
+    final bottomPadding = size.height - padding.bottom;
+    return EdgeInsets.fromLTRB(
+      padding.left,
+      padding.top,
+      rightPaddding,
+      bottomPadding,
+    );
   }
 }

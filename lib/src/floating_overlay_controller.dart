@@ -118,61 +118,49 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _logger.info('Showing overlay');
     _entry = OverlayEntry(
       builder: (context) {
-        return StreamBuilder<Offset>(
-          initialData: _offset.state,
-          stream: _offset.stream,
-          builder: (context, snapshot) {
-            final position = snapshot.data!;
-            return Positioned(
-              left: position.dx,
-              top: position.dy,
-              child: StreamBuilder<double>(
-                initialData: _scale.state,
-                stream: _scale.stream,
-                builder: (context, snapshot) {
-                  final scale = snapshot.data!;
-                  final vector = Vector3(scale, scale, scale);
-                  return Transform(
-                    alignment: Alignment.topLeft,
-                    transform: Matrix4.diagonal3(vector),
-                    child: GestureDetector(
-                      key: _key,
-                      onScaleStart: (_) {
-                        _scale.onStart();
-                        _offset.onStart(_key!, scale);
-                      },
-                      onScaleUpdate: (details) {
-                        _scale.onUpdate(details, _key);
-                        _offset.onUpdate(details.delta, _key!, scale);
-                      },
-                      child: Builder(
-                        builder: (context) {
-                          WidgetsBinding.instance?.addPostFrameCallback((_) {
-                            final _context = _key!.currentContext!;
-                            final box =
-                                _context.findRenderObject() as RenderBox?;
-                            final childSize = box?.size;
-                            emit(
-                              FloatingOverlayData(
-                                childSize: childSize ?? Size.zero,
-                                scale: scale,
-                                position: position,
-                              ),
-                            );
-                          });
-                          return _child ?? const SizedBox.shrink();
-                        },
-                      ),
-                    ),
-                  );
-                },
-              ),
-            );
-          },
+        return _FloatingOverlayPositioned(
+          offsetController: _offset,
+          child: _FloatingOverlatTransform(
+            scaleController: _scale,
+            child: GestureDetector(
+              key: _key,
+              onScaleStart: (_) {
+                _scale.onStart(_key);
+                _offset.onStart(_scale, _key!);
+              },
+              onScaleUpdate: (details) {
+                _scale.onUpdate(details.scale);
+                _offset.onUpdate(details.delta);
+              },
+              child: floatingChild(),
+            ),
+          ),
         );
       },
     );
 
     _overlay?.insert(_entry!);
+  }
+
+  Size get _childSize{
+    final _context = _key!.currentContext!;
+    final box = _context.findRenderObject() as RenderBox?;
+    return box?.size ?? Size.zero;
+  }
+
+  Widget floatingChild() {
+    return Builder(
+      builder: (context) {
+        WidgetsBinding.instance?.addPostFrameCallback((_) {
+          final data = FloatingOverlayData(
+            position: _offset.state,
+            childSize: _childSize,
+            scale: _scale.state,
+          );
+          emit(data);
+        });
+        return _child ?? const SizedBox.shrink();
+      },
+    );
   }
 }
