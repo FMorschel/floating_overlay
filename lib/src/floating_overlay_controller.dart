@@ -1,6 +1,10 @@
 part of 'floating_overlay.dart';
 
 class FloatingOverlayController extends Cubit<FloatingOverlayData> {
+  /// The controller for the [FloatingOverlay].
+  /// 
+  /// Be sure to initialize this only once (probably inside `initState` method)
+  /// when inside a Stateful Widget that has an [AnimationController] inside.
   FloatingOverlayController.relativeSize({
     /// Minimum scale to resize the floating child.
     double? minScale,
@@ -31,6 +35,10 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
           ),
         );
 
+  /// The controller for the [FloatingOverlay].
+  /// 
+  /// Be sure to initialize this only once (probably inside `initState` method)
+  /// when inside a Stateful Widget that has an [AnimationController] inside.
   FloatingOverlayController.absoluteSize({
     /// Minimum size to resize the floating child.
     Size? minSize,

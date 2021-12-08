@@ -43,6 +43,123 @@ class HomePage extends StatelessWidget {
       padding: const EdgeInsets.all(20.0),
       constrained: true,
     );
+    final routeObserver = Provider.of<RouteObserver>(context, listen: false);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Floating Overlay Example'),
+        centerTitle: true,
+      ),
+      body: FloatingOverlay(
+        // Passing the RouteObserver created at line 17 as a parameter, will
+        // make so that when you push pages on top of this one, the floating
+        // child will vanish and reappear when you return.
+        routeObserver: routeObserver,
+        controller: controller,
+        floatingChild: SizedBox.square(
+          dimension: 100.0,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              border: Border.all(
+                color: Colors.black,
+                width: 5.0,
+              ),
+            ),
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  child: const Text('Toggle Overlay'),
+                  onPressed: () {
+                    controller.toggle();
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  child: const Text('New Page'),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const NewPage()),
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  child: const Text('New Page with AnimationController'),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => Provider<RouteObserver>(
+                          // There is a difference to initializing the 
+                          // controller inside a Stateful Widget that has an
+                          // [AnimationController].
+                          create: (_) => routeObserver,
+                          child: const AnimationPage(),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class NewPage extends StatelessWidget {
+  const NewPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('New Page'), centerTitle: true),
+    );
+  }
+}
+
+class AnimationPage extends StatefulWidget {
+  const AnimationPage({Key? key}) : super(key: key);
+
+  @override
+  _AnimationPageState createState() => _AnimationPageState();
+}
+
+class _AnimationPageState extends State<AnimationPage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController animationController;
+  late final FloatingOverlayController controller;
+
+  @override
+  void initState() {
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+    /// The [FloatingOverlayController] needs to be initialized only once when 
+    /// there is an [AnimationController] inside the same State.
+    controller = FloatingOverlayController.absoluteSize(
+      maxSize: const Size(200, 200),
+      minSize: const Size(100, 100),
+      padding: const EdgeInsets.all(20.0),
+      constrained: true,
+    );
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Floating Overlay Example'),
@@ -94,17 +211,6 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class NewPage extends StatelessWidget {
-  const NewPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('New Page'), centerTitle: true),
     );
   }
 }

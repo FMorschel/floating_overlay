@@ -1,5 +1,3 @@
-library floating_overlay;
-
 import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
 import 'package:logging/logging.dart';
