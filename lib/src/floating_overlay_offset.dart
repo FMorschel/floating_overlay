@@ -7,12 +7,14 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
   })  : _padding = padding ?? EdgeInsets.zero,
         _constrainPadding = padding ?? EdgeInsets.zero,
         _previousOffset = start ?? Offset.zero,
+        _startOffset = start ?? Offset.zero,
         super(start ?? Offset.zero);
 
   final EdgeInsets _padding;
   EdgeInsets _constrainPadding;
   bool _constrained = false;
   Offset _previousOffset;
+  Offset _startOffset;
   _FloatingOverlayScale? _scale;
   GlobalKey? _key;
 
@@ -31,7 +33,12 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
     emit(_validValue(offset, screenSize));
   }
 
-  void onStart(final _FloatingOverlayScale scale, final GlobalKey key) {
+  void onStart(
+    final _FloatingOverlayScale scale,
+    final GlobalKey key,
+    final Offset startOffset,
+  ) {
+    _startOffset = startOffset;
     _previousOffset = state;
     _scale = scale;
     _scale!.stream.listen((scale) {
@@ -47,17 +54,20 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
 
   void onUpdate(Offset offset) {
     if (_context != null) {
-      _update(offset: offset);
+      _update(offset: (offset - _startOffset));
     } else {
-      emit(_previousOffset + offset);
+      emit((offset - _startOffset));
     }
   }
 
-  void _update({Offset? offset, double? scale}) {
+  void _update({
+    Offset? offset,
+    double? scale,
+  }) {
     final currentScale = scale ?? _scale!.state;
     final screenSize = MediaQuery.of(_context!).size;
     final widgetSize = _widgetSize(_context!);
-    final _offset = offset == null ? state : _previousOffset + offset;
+    final _offset = (offset != null) ? (_previousOffset + offset) : state;
     emit(_validValue(_offset, screenSize, widgetSize * currentScale));
   }
 

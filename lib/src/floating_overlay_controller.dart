@@ -138,13 +138,13 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
             scaleController: _scale,
             child: GestureDetector(
               key: _key,
-              onScaleStart: (_) {
+              onScaleStart: (details) {
                 _scale.onStart(_offset, _key!);
-                _offset.onStart(_scale, _key!);
+                _offset.onStart(_scale, _key!, details.focalPoint);
               },
               onScaleUpdate: (details) {
                 _scale.onUpdate(details.scale);
-                _offset.onUpdate(details.delta);
+                _offset.onUpdate(details.focalPoint);
               },
               child: floatingChild(),
             ),
