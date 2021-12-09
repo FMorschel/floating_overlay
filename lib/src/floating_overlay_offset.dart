@@ -1,21 +1,23 @@
 part of 'floating_overlay.dart';
 
 class _FloatingOverlayOffset extends Cubit<Offset> {
-  _FloatingOverlayOffset(Offset? initialState, [EdgeInsets? padding])
-      : _padding = padding ?? EdgeInsets.zero,
-        _constrainedPadding = padding ?? EdgeInsets.zero,
-        _previousOffset = initialState ?? Offset.zero,
-        super(initialState ?? Offset.zero);
+  _FloatingOverlayOffset({
+    Offset? start,
+    EdgeInsets? padding,
+  })  : _padding = padding ?? EdgeInsets.zero,
+        _constrainPadding = padding ?? EdgeInsets.zero,
+        _previousOffset = start ?? Offset.zero,
+        super(start ?? Offset.zero);
 
   final EdgeInsets _padding;
-  EdgeInsets _constrainedPadding;
+  EdgeInsets _constrainPadding;
   bool _constrained = false;
   Offset _previousOffset;
   _FloatingOverlayScale? _scale;
   GlobalKey? _key;
 
   void init(EdgeInsets padding, bool constrained) {
-    _constrainedPadding = EdgeInsets.fromLTRB(
+    _constrainPadding = EdgeInsets.fromLTRB(
       padding.left + _padding.left,
       padding.top + _padding.top,
       padding.right + _padding.right,
@@ -41,8 +43,7 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
   }
 
   BuildContext? get _context => _key?.currentContext;
-  EdgeInsets get currentPadding =>
-      _constrained ? _constrainedPadding : _padding;
+  EdgeInsets get _currentPadding => _constrained ? _constrainPadding : _padding;
 
   void onUpdate(Offset offset) {
     if (_context != null) {
@@ -53,10 +54,11 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
   }
 
   void _update({Offset? offset, double? scale}) {
+    final currentScale = scale ?? _scale!.state;
     final screenSize = MediaQuery.of(_context!).size;
-    final widgetSize = _widgetSize(_context!) * (scale ?? _scale!.state);
+    final widgetSize = _widgetSize(_context!);
     final _offset = offset == null ? state : _previousOffset + offset;
-    emit(_validValue(_offset, screenSize, widgetSize));
+    emit(_validValue(_offset, screenSize, widgetSize * currentScale));
   }
 
   Size _widgetSize(BuildContext context) {
@@ -71,14 +73,14 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
   ]) {
     double? width;
     double? height;
-    final limits = _limitsFrom(currentPadding, screen);
-    final pixels = _childPixels(offset, child);
+    final limits = _limitsFrom(screen);
+    final rect = _childRect(offset, child);
 
-    if (pixels.right > limits.right) width = limits.right - child.width;
-    if (pixels.left < limits.left) width = limits.left;
+    if (rect.right > limits.right) width = limits.right - child.width;
+    if (rect.left < limits.left) width = limits.left;
 
-    if (pixels.bottom > limits.bottom) height = limits.bottom - child.height;
-    if (pixels.top < limits.top) height = limits.top;
+    if (rect.bottom > limits.bottom) height = limits.bottom - child.height;
+    if (rect.top < limits.top) height = limits.top;
 
     return Offset(
       width ?? offset.dx,
@@ -86,8 +88,8 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
     );
   }
 
-  EdgeInsets _childPixels(Offset offset, Size? size) {
-    return EdgeInsets.fromLTRB(
+  Rect _childRect(Offset offset, Size? size) {
+    return Rect.fromLTRB(
       offset.dx,
       offset.dy,
       offset.dx + (size?.width ?? 0),
@@ -95,12 +97,12 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
     );
   }
 
-  EdgeInsets _limitsFrom(EdgeInsets padding, Size size) {
-    final rightPaddding = size.width - padding.right;
-    final bottomPadding = size.height - padding.bottom;
-    return EdgeInsets.fromLTRB(
-      padding.left,
-      padding.top,
+  Rect _limitsFrom(Size screenSize) {
+    final rightPaddding = screenSize.width - _currentPadding.right;
+    final bottomPadding = screenSize.height - _currentPadding.bottom;
+    return Rect.fromLTRB(
+      _currentPadding.left,
+      _currentPadding.top,
       rightPaddding,
       bottomPadding,
     );

@@ -24,12 +24,14 @@ class _FloatingOverlayScale extends Cubit<double> {
   final Size? _minSize;
   final Size? _maxSize;
   double _previousScale = 1.0;
+  _FloatingOverlayOffset? _offset;
   GlobalKey? _key;
 
   BuildContext? get _context => _key?.currentContext;
 
-  void onStart([GlobalKey? key]) {
+  void onStart(final _FloatingOverlayOffset offset, final GlobalKey key) {
     _previousScale = state;
+    _offset = offset;
     _key = key;
   }
 
@@ -38,14 +40,27 @@ class _FloatingOverlayScale extends Cubit<double> {
     final minScale = _minScale ?? 1.0;
     final maxScale = _maxScale ?? 1.0;
     if (_context != null) {
+      final screenSize = MediaQuery.of(_context!).size;
       final childSize = _widgetSize(_context!);
       final minSize = _minSize ?? (childSize * minScale);
       final maxSize = _maxSize ?? (childSize * maxScale);
-      final clampedSize = (childSize * newScale).clamp(minSize, maxSize);
+      final maxConstraints = _maxSizeConstraints(screenSize);
+      final actualMax = maxSize.clamp(Size.zero, maxConstraints);
+      final clampedSize = (childSize * newScale).clamp(minSize, actualMax);
       emit(clampedSize.div(childSize));
     } else {
       emit(newScale.clamp(minScale, maxScale));
     }
+  }
+
+  Size _maxSizeConstraints(Size screen) {
+    if (_offset != null) {
+      final constraints = _offset!._limitsFrom(screen);
+      final height = constraints.bottom - constraints.top;
+      final width = constraints.right - constraints.left;
+      return Size(width, height);
+    }
+    return Size.infinite;
   }
 
   Size _widgetSize(BuildContext context) {

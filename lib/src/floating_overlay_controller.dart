@@ -21,7 +21,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     /// If the floating child's space to float will be limited by the maximum
     /// size that the FloatingOverlay can be.
     bool? constrained,
-  })  : _offset = _FloatingOverlayOffset(start, padding),
+  })  : _offset = _FloatingOverlayOffset(start: start, padding: padding),
         _constrained = constrained ?? false,
         _scale = _FloatingOverlayScale.relative(
           minScale: minScale,
@@ -31,7 +31,10 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
           FloatingOverlayData(
             childSize: Size.zero,
             scale: 1.0,
-            position: _FloatingOverlayOffset(start, padding).state,
+            position: _FloatingOverlayOffset(
+              start: start,
+              padding: padding,
+            ).state,
           ),
         );
 
@@ -55,7 +58,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     /// If the floating child's space to float will be limited by the maximum
     /// size that the FloatingOverlay can be.
     bool? constrained,
-  })  : _offset = _FloatingOverlayOffset(start, padding),
+  })  : _offset = _FloatingOverlayOffset(start: start, padding: padding),
         _constrained = constrained ?? false,
         _scale = _FloatingOverlayScale.absolute(
           maxSize: maxSize,
@@ -65,7 +68,10 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
           FloatingOverlayData(
             childSize: Size.zero,
             scale: 1.0,
-            position: _FloatingOverlayOffset(start, padding).state,
+            position: _FloatingOverlayOffset(
+              start: start,
+              padding: padding,
+            ).state,
           ),
         );
 
@@ -126,14 +132,14 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _logger.info('Showing overlay');
     _entry = OverlayEntry(
       builder: (context) {
-        return _FloatingOverlayPositioned(
+        return _Reposition(
           offsetController: _offset,
-          child: _FloatingOverlatTransform(
+          child: _Rescale(
             scaleController: _scale,
             child: GestureDetector(
               key: _key,
               onScaleStart: (_) {
-                _scale.onStart(_key);
+                _scale.onStart(_offset, _key!);
                 _offset.onStart(_scale, _key!);
               },
               onScaleUpdate: (details) {

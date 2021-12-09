@@ -1,7 +1,7 @@
 part of 'floating_overlay.dart';
 
-class _FloatingOverlatTransform extends StatelessWidget {
-  const _FloatingOverlatTransform({
+class _Rescale extends StatelessWidget {
+  const _Rescale({
     Key? key,
     required this.child,
     required this.scaleController,
@@ -17,9 +17,8 @@ class _FloatingOverlatTransform extends StatelessWidget {
       stream: scaleController.stream,
       builder: (context, snapshot) {
         final scale = snapshot.data!;
-        final vector = Vector3(scale, scale, scale);
+        final vector = Vector3(scale, scale, 1.0);
         return Transform(
-          alignment: Alignment.topLeft,
           transform: Matrix4.diagonal3(vector),
           child: child,
         );

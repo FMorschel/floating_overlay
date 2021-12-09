@@ -1,7 +1,7 @@
 part of 'floating_overlay.dart';
 
-class _FloatingOverlayPositioned extends StatelessWidget {
-  const _FloatingOverlayPositioned({
+class _Reposition extends StatelessWidget {
+  const _Reposition({
     Key? key,
     required this.child,
     required this.offsetController,
@@ -18,8 +18,8 @@ class _FloatingOverlayPositioned extends StatelessWidget {
       builder: (context, snapshot) {
         final position = snapshot.data!;
         return Positioned(
-          left: position.dx,
           top: position.dy,
+          left: position.dx,
           child: child,
         );
       },

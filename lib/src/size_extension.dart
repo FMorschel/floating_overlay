@@ -15,11 +15,15 @@ extension _SizeExtension on Size {
   /// Returns this size clamped to be in the range lowerLimit-upperLimit.
   ///
   /// The arguments lowerLimit and upperLimit must form a valid range where
-  /// lowerLimit < upperLimit.
+  /// `(lowerLimit.height < upperLimit.height) && (lowerLimit.width <
+  /// upperLimit.width)`.
   Size clamp(Size lowerLimit, Size upperLimit) {
-    assert(lowerLimit < upperLimit);
-    if (this < lowerLimit) return lowerLimit;
-    if (this > upperLimit) return upperLimit;
+    assert(lowerLimit.height < upperLimit.height);
+    assert(lowerLimit.width < upperLimit.width);
+    if (height < lowerLimit.height) return lowerLimit;
+    if (width < lowerLimit.width) return lowerLimit;
+    if (height > upperLimit.height) return upperLimit;
+    if (width > upperLimit.width) return upperLimit;
     return this;
   }
 }

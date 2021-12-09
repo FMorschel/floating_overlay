@@ -1,4 +1,8 @@
 
+# 1.0.5 - 2021.12.09
+
+* Better scaling considering constraints and more refactoring.
+
 # 1.0.4 - 2021.12.08
 
 * Refactored Cubit classes.
