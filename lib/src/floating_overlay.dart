@@ -1,9 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
 import 'package:logging/logging.dart';
-import 'package:vector_math/vector_math_64.dart' show Vector3;
 
 part 'floating_overlay_controller.dart';
 part 'floating_overlay_offset.dart';
