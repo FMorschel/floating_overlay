@@ -135,6 +135,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
         return _Reposition(
           offsetController: _offset,
           child: _Rescale(
+            childKey: _key!,
             scaleController: _scale,
             child: GestureDetector(
               key: _key,
