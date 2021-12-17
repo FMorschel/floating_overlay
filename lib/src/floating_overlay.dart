@@ -3,11 +3,13 @@ import 'package:bloc/bloc.dart';
 import 'package:logging/logging.dart';
 
 part 'floating_overlay_controller.dart';
+part 'floating_overlay_cursor.dart';
 part 'floating_overlay_offset.dart';
 part 'floating_overlay_scale.dart';
 part 'floating_overlay_data.dart';
 part 'reposition.dart';
 part 'rescale.dart';
+part 'cursor_resizing.dart';
 part 'size_extension.dart';
 
 class FloatingOverlay extends StatefulWidget {
