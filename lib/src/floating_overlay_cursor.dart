@@ -10,18 +10,51 @@ class _FloatingOverlayCursor {
   final _FloatingOverlayScale _scale;
   final _FloatingOverlayOffset _offset;
   Offset _startOffset = Offset.zero;
+  Rect _startRect = Rect.zero;
 
-  void onStart(
-    final GlobalKey key,
-    final Offset startOffset,
-  ) {
+  Offset mainDirectionDelta(Offset newOffset, _Side side) {
+    final delta = newOffset - _startOffset;
+    if (side.diagonal) {
+      if (delta.dx.abs() > delta.dy.abs()) {
+        return Offset(delta.dx, 0) * 2;
+      } else {
+        return Offset(0, delta.dy) * 2;
+      }
+    } else if (side.horizontal) {
+      return Offset(delta.dx, 0);
+    } else {
+      return Offset(0, delta.dy);
+    }
+  }
+
+  void onStart(Offset startOffset, FloatingOverlayData data) {
     _scale.onStart();
     _offset.onStart(startOffset);
     _startOffset = startOffset;
+    _startRect = data.childRect;
   }
 
-  void onUpdate(Offset globalPosition, [double multiplyer = 1.0]) {
-    assert((multiplyer == 1.0) || (multiplyer == -1.0));
-    final delta = (globalPosition - _startOffset) * multiplyer;
+  void onUpdate(Offset delta, FloatingOverlayData data) {
+    final size = data.childSize;
+    final previousScale = _scale.state;
+    _scale.onUpdateDelta(delta, data);
+    final newScale = _scale.state;
+    if (newScale != previousScale) {
+      final newSize = size * newScale;
+      final newRect = Alignment.center.inscribe(newSize, _startRect);
+      debugPrint(
+        'NewRect Offset:${newRect.topLeft}\n'
+        'OldRect Offset:${_startRect.topLeft}',
+      );
+      _offset.onUpdateDelta(
+        newRect.topLeft - _startRect.topLeft,
+        data.childRect.size,
+      );
+      debugPrint('newOffset: ${_offset.state}');
+    }
+  }
+
+  void onEnd() {
+    _offset.onEnd();
   }
 }

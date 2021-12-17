@@ -11,6 +11,7 @@ part 'reposition.dart';
 part 'rescale.dart';
 part 'cursor_resizing.dart';
 part 'size_extension.dart';
+part 'cursor_border_side.dart';
 
 class FloatingOverlay extends StatefulWidget {
   const FloatingOverlay({

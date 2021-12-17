@@ -56,16 +56,24 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
     FloatingOverlayData data,
     double previousScale,
   ) {
+    final scaleOffset = _scaleOffset(data, previousScale);
+    final delta = newOffset - _startOffset - scaleOffset;
+    onUpdateDelta(delta, data.childRect.size);
+  }
+
+  Offset _scaleOffset(FloatingOverlayData data, double previousScale) {
     final previousSize = data.copyWith(scale: previousScale).childRect.size;
     final currentSize = data.childRect.size;
     final difference = Size(
       currentSize.width - previousSize.width,
       currentSize.height - previousSize.height,
     );
-    final scaleOffset = Offset(difference.width / 2, difference.height / 2);
-    final delta = newOffset - _startOffset - scaleOffset;
+    return Offset(difference.width / 2, difference.height / 2);
+  }
+
+  void onUpdateDelta(Offset delta, Size size) {
     final offset = (_previousOffset + delta);
-    emit(_validValue(offset, data.childRect.size));
+    emit(_validValue(offset, size));
   }
 
   Offset _validValue(Offset offset, Size childSize) {

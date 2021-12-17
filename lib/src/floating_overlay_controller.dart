@@ -82,6 +82,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
             ).state,
           ),
         ) {
+    _cursorController = _FloatingOverlayCursor(scale: _scale, offset: _offset);
     _streamProcess();
   }
 
@@ -95,9 +96,10 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   }
 
   static final _logger = Logger('FloatingOverlayController');
+  late final _FloatingOverlayCursor _cursorController;
   final _FloatingOverlayOffset _offset;
   final _FloatingOverlayScale _scale;
-  final _key = GlobalKey();
+  GlobalKey _key = GlobalKey();
   OverlayState? _overlay;
   OverlayEntry? _entry;
   Widget? _child;
@@ -112,7 +114,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _offset.init(limits, MediaQuery.of(context).size);
     _overlay = Overlay.of(context);
     _createInvisibleChild(_startChildSize);
-    _scale.init(_offset.floatingLimits!);
+    _scale.init(floatingLimits!);
     _offset.set(_offset.state, state.childRect.size);
   }
 
@@ -200,45 +202,94 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   Widget get _entryWidget {
     return _Reposition(
       offsetController: _offset,
-      child: _Rescale(
-        data: state,
-        scaleController: _scale,
-        child: GestureDetector(
-          onScaleStart: (details) {
-            _scale.onStart();
-            _offset.onStart(details.focalPoint);
-          },
-          onScaleUpdate: (details) {
-            _scale.onUpdate(details.scale, state);
-            final previousScale = _scale._previousScale;
-            _offset.onUpdate(details.focalPoint, state, previousScale);
-          },
-          onScaleEnd: (_) {
-            _offset.onEnd();
-          },
-          child: Builder(
-            builder: (context) {
-              WidgetsBinding.instance?.addPostFrameCallback(
-                (_) => emit(
-                  state.copyWith(
-                    position: _offset.state,
-                    childSize: _childSize,
-                    scale: _scale.state,
-                  ),
-                ),
-              );
-              return _floatingChild;
-            },
+      child: Stack(
+        children: [
+          _Rescale(
+            data: state,
+            scaleController: _scale,
+            child: gestureDetector,
           ),
+          _CursorResizing(
+            side: _Side.left,
+            controller: _cursorController,
+            data: () => state,
+          ),
+          _CursorResizing(
+            side: _Side.top,
+            controller: _cursorController,
+            data: () => state,
+          ),
+          _CursorResizing(
+            side: _Side.right,
+            controller: _cursorController,
+            data: () => state,
+          ),
+          _CursorResizing(
+            side: _Side.bottom,
+            controller: _cursorController,
+            data: () => state,
+          ),
+          _CursorResizing(
+            side: _Side.topLeft,
+            controller: _cursorController,
+            data: () => state,
+          ),
+          _CursorResizing(
+            side: _Side.topRight,
+            controller: _cursorController,
+            data: () => state,
+          ),
+          _CursorResizing(
+            side: _Side.bottomLeft,
+            controller: _cursorController,
+            data: () => state,
+          ),
+          _CursorResizing(
+            side: _Side.bottomRight,
+            controller: _cursorController,
+            data: () => state,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget get gestureDetector {
+    WidgetsBinding.instance?.addPostFrameCallback(
+      (_) => emit(
+        state.copyWith(
+          position: _offset.state,
+          childSize: _childSize,
+          scale: _scale.state,
         ),
       ),
+    );
+    return GestureDetector(
+      onScaleStart: (details) {
+        _scale.onStart();
+        _offset.onStart(details.focalPoint);
+      },
+      onScaleUpdate: (details) {
+        _scale.onUpdate(details.scale, state);
+        final previousScale = _scale._previousScale;
+        _offset.onUpdate(details.focalPoint, state, previousScale);
+      },
+      onScaleEnd: (_) {
+        _offset.onEnd();
+      },
+      child: _floatingChild,
     );
   }
 
   Widget get _floatingChild {
     return Container(
-      key: _key,
+      key: _key.currentWidget != null ? _key : _newKey,
       child: _child ?? const SizedBox.shrink(),
     );
+  }
+
+  GlobalKey get _newKey {
+    _key = GlobalKey();
+    return _key;
   }
 }

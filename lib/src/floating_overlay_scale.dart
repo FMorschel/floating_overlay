@@ -34,6 +34,15 @@ class _FloatingOverlayScale extends Cubit<double> {
 
   void onStart() => _previousScale = state;
 
+  void onUpdateDelta(Offset delta, FloatingOverlayData data) {
+    final changed = Size(delta.dx, delta.dy);
+    final newSize = Size(
+      data.childRect.size.width + changed.width,
+      data.childRect.size.height + changed.height,
+    );
+    onUpdate(newSize.div(data.childRect.size), data);
+  }
+
   void onUpdate(double scale, FloatingOverlayData data) {
     final childSize = data.childSize;
     final minSize = _minSize ?? (childSize * (_minScale ?? 1.0));

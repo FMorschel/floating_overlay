@@ -1,85 +1,59 @@
 part of 'floating_overlay.dart';
 
-enum Side {
-  left,
-  top,
-  right,
-  bottom,
-}
-
 class _CursorResizing extends StatelessWidget {
   const _CursorResizing({
     Key? key,
     required this.side,
-    required this.childKey,
-    required this.cursorController,
+    required this.controller,
+    required this.data,
     this.width,
   }) : super(key: key);
 
-  final Side side;
+  final _Side side;
   final double? width;
-  final GlobalKey childKey;
-  final _FloatingOverlayCursor cursorController;
+  final FloatingOverlayData Function() data;
+  final _FloatingOverlayCursor controller;
 
   @override
   Widget build(BuildContext context) {
-    late final MouseCursor cursor;
-    double? _width;
-    double? _height;
-    if ((side == Side.right) || (side == Side.left)) {
-      cursor = SystemMouseCursors.resizeLeftRight;
-      _width = width ?? 2;
-    } else {
-      cursor = SystemMouseCursors.resizeUpDown;
-      _height = width ?? 2;
-    }
-    double? left;
-    double? top;
-    double? right;
-    double? bottom;
-    if (side == Side.left) {
-      left = 0;
-      top = width ?? 2;
-      bottom = width ?? 2;
-    } else if (side == Side.top) {
-      top = 0;
-      left = width ?? 2;
-      right = width ?? 2;
-    } else if (side == Side.right) {
-      right = 0;
-      top = width ?? 2;
-      bottom = width ?? 2;
-    } else if (side == Side.bottom) {
-      bottom = 0;
-      left = width ?? 2;
-      right = width ?? 2;
-    }
     return Positioned(
-      left: left,
-      top: top,
-      right: right,
-      bottom: bottom,
+      left: side.leftDistance,
+      top: side.topDistance,
+      right: side.rightDistance,
+      bottom: side.bottomDistance,
       child: GestureDetector(
-        onHorizontalDragStart: (details) {
-          cursorController.onStart(childKey, details.globalPosition);
-        },
-        onHorizontalDragUpdate: (details) {
-          if ((side == Side.left) || (side == Side.top)) {
-            cursorController.onUpdate(details.globalPosition, -1);
-          } else {
-            cursorController.onUpdate(details.globalPosition);
-          }
-        },
+        onPanStart: side.diagonal ? onStart : null,
+        onPanUpdate: side.diagonal ? onUpdate : null,
+        onPanEnd: side.diagonal ? onEnd : null,
+        onVerticalDragStart: side.vertical ? onStart : null,
+        onVerticalDragUpdate: side.vertical ? onUpdate : null,
+        onVerticalDragEnd: side.vertical ? onEnd : null,
+        onHorizontalDragStart: side.horizontal ? onStart : null,
+        onHorizontalDragUpdate: side.horizontal ? onUpdate : null,
+        onHorizontalDragEnd: side.horizontal ? onEnd : null,
         child: MouseRegion(
-          cursor: cursor,
+          cursor: side.cursor,
           opaque: true,
           child: SizedBox(
-            width: _width,
-            height: _height,
+            width: side.width,
+            height: side.height,
             child: Container(color: Colors.red),
           ),
         ),
       ),
     );
+  }
+
+  void onStart(DragStartDetails details) {
+    controller.onStart(details.globalPosition, data());
+  }
+
+  void onUpdate(DragUpdateDetails details) {
+    final delta = controller.mainDirectionDelta(details.globalPosition, side);
+    controller.onUpdate(side.consideringDelta(delta), data());
+  }
+
+  void onEnd(void _) {
+    controller.onEnd();
   }
 }

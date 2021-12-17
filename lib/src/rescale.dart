@@ -23,10 +23,7 @@ class _Rescale extends StatelessWidget {
         if (data.childSize != Size.zero) size = data.childSize * scale;
         return SizedBox.fromSize(
           size: size,
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: child,
-          ),
+          child: child,
         );
       },
     );
