@@ -56,21 +56,21 @@ class _FloatingOverlayState extends State<FloatingOverlay> with RouteAware {
   bool floating = false;
 
   void startController(BuildContext context, BoxConstraints constraints) {
-    final screen = MediaQuery.of(context).size;
+    final offset = widgetOffset();
+    final _endOffset = endOffset(offset, constraints.biggest);
+    final limits = Rect.fromPoints(offset, _endOffset);
+    final child = widget.floatingChild ?? empty;
+    controller._initState(context, child, limits);
+  }
+
+  Offset widgetOffset() {
     final box = key.currentContext!.findRenderObject()! as RenderBox;
-    final offset = box.localToGlobal(Offset.zero);
-    final padding = EdgeInsets.fromLTRB(
-      offset.dx,
-      offset.dy,
-      screen.width - (offset.dx + constraints.maxWidth),
-      screen.height - (offset.dy + constraints.maxHeight),
-    );
-    controller._initState(
-      context,
-      widget.floatingChild ?? empty,
-      padding,
-      floatingWidgetKey,
-    );
+    return box.localToGlobal(Offset.zero);
+  }
+
+  Offset endOffset(Offset start, Size maxSize) {
+    final maxSizeOffset = Offset(maxSize.width, maxSize.height);
+    return start + maxSizeOffset;
   }
 
   @override

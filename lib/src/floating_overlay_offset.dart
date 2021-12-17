@@ -4,117 +4,87 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
   _FloatingOverlayOffset({
     Offset? start,
     EdgeInsets? padding,
-  })  : _padding = padding ?? EdgeInsets.zero,
-        _constrainPadding = padding ?? EdgeInsets.zero,
+    bool constrained = false,
+  })  : _constrained = constrained,
+        _padding = padding ?? EdgeInsets.zero,
         _previousOffset = start ?? Offset.zero,
         _startOffset = start ?? Offset.zero,
         super(start ?? Offset.zero);
 
   final EdgeInsets _padding;
-  EdgeInsets _constrainPadding;
-  bool _constrained = false;
+  final bool _constrained;
   Offset _previousOffset;
   Offset _startOffset;
-  _FloatingOverlayScale? _scale;
-  GlobalKey? _key;
+  Rect? floatingLimits;
 
-  void init(EdgeInsets padding, bool constrained) {
-    _constrainPadding = EdgeInsets.fromLTRB(
-      padding.left + _padding.left,
-      padding.top + _padding.top,
-      padding.right + _padding.right,
-      padding.bottom + _padding.bottom,
-    );
-    _constrained = constrained;
-  }
-
-  void set(Offset offset, Size screenSize) {
-    _previousOffset = _validValue(offset, screenSize);
-    emit(_validValue(offset, screenSize));
-  }
-
-  void onStart(
-    final _FloatingOverlayScale scale,
-    final GlobalKey key,
-    final Offset startOffset,
-  ) {
-    _startOffset = startOffset;
-    _previousOffset = state;
-    _scale = scale;
-    _scale!.stream.listen((scale) {
-      if (_context != null) {
-        _update(scale: scale);
-      }
-    });
-    _key = key;
-  }
-
-  BuildContext? get _context => _key?.currentContext;
-  EdgeInsets get _currentPadding => _constrained ? _constrainPadding : _padding;
-
-  void onUpdate(Offset offset) {
-    if (_context != null) {
-      _update(offset: (offset - _startOffset));
+  void init(Rect limits, Size screenSize) {
+    if (_constrained) {
+      floatingLimits = Rect.fromLTRB(
+        limits.left + _padding.left,
+        limits.top + _padding.top,
+        limits.right - _padding.right,
+        limits.bottom - _padding.bottom,
+      );
     } else {
-      emit((offset - _startOffset));
+      final rightPaddding = screenSize.width - _padding.right;
+      final bottomPadding = screenSize.height - _padding.bottom;
+      floatingLimits = Rect.fromLTRB(
+        _padding.left,
+        _padding.top,
+        rightPaddding,
+        bottomPadding,
+      );
     }
   }
 
-  void _update({
-    Offset? offset,
-    double? scale,
-  }) {
-    final currentScale = scale ?? _scale!.state;
-    final screenSize = MediaQuery.of(_context!).size;
-    final widgetSize = _widgetSize(_context!);
-    final _offset = (offset != null) ? (_previousOffset + offset) : state;
-    emit(_validValue(_offset, screenSize, widgetSize * currentScale));
+  void set(Offset offset, Size childSize) {
+    emit(_validValue(offset, childSize));
+    onEnd();
   }
 
-  Size _widgetSize(BuildContext context) {
-    final renderBox = context.findRenderObject() as RenderBox;
-    return renderBox.size;
+  void setGlobal(Offset newOffset, FloatingOverlayData data) {
+    emit(_validValue(newOffset, data.childRect.size));
+    onEnd();
   }
 
-  Offset _validValue(
-    Offset offset,
-    Size screen, [
-    Size child = Size.zero,
-  ]) {
-    double? width;
-    double? height;
-    final limits = _limitsFrom(screen);
-    final rect = _childRect(offset, child);
+  void onStart(Offset newOffset) => _startOffset = newOffset;
 
-    if (rect.right > limits.right) width = limits.right - child.width;
-    if (rect.left < limits.left) width = limits.left;
+  void onEnd() => _previousOffset = state;
 
-    if (rect.bottom > limits.bottom) height = limits.bottom - child.height;
-    if (rect.top < limits.top) height = limits.top;
+  void onUpdate(
+    Offset newOffset,
+    FloatingOverlayData data,
+    double previousScale,
+  ) {
+    final previousSize = data.copyWith(scale: previousScale).childRect.size;
+    final currentSize = data.childRect.size;
+    final difference = Size(
+      currentSize.width - previousSize.width,
+      currentSize.height - previousSize.height,
+    );
+    final scaleOffset = Offset(difference.width / 2, difference.height / 2);
+    final delta = newOffset - _startOffset - scaleOffset;
+    final offset = (_previousOffset + delta);
+    emit(_validValue(offset, data.childRect.size));
+  }
+
+  Offset _validValue(Offset offset, Size childSize) {
+    double? dx;
+    double? dy;
+    final limits = floatingLimits!;
+    final rect = offset & childSize;
+
+    if (rect.right > limits.right) dx = limits.right - rect.width;
+    if ((dx != null) && (dx < limits.left)) dx = limits.left;
+    if (rect.left < limits.left) dx = limits.left;
+
+    if (rect.bottom > limits.bottom) dy = limits.bottom - rect.height;
+    if ((dy != null) && (dy < limits.top)) dy = limits.top;
+    if (rect.top < limits.top) dy = limits.top;
 
     return Offset(
-      width ?? offset.dx,
-      height ?? offset.dy,
-    );
-  }
-
-  Rect _childRect(Offset offset, Size? size) {
-    return Rect.fromLTRB(
-      offset.dx,
-      offset.dy,
-      offset.dx + (size?.width ?? 0),
-      offset.dy + (size?.height ?? 0),
-    );
-  }
-
-  Rect _limitsFrom(Size screenSize) {
-    final rightPaddding = screenSize.width - _currentPadding.right;
-    final bottomPadding = screenSize.height - _currentPadding.bottom;
-    return Rect.fromLTRB(
-      _currentPadding.left,
-      _currentPadding.top,
-      rightPaddding,
-      bottomPadding,
+      dx ?? offset.dx,
+      dy ?? offset.dy,
     );
   }
 }

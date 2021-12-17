@@ -20,9 +20,12 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
 
     /// If the floating child's space to float will be limited by the maximum
     /// size that the FloatingOverlay can be.
-    bool? constrained,
-  })  : _offset = _FloatingOverlayOffset(start: start, padding: padding),
-        _constrained = constrained ?? false,
+    bool constrained = false,
+  })  : _offset = _FloatingOverlayOffset(
+          start: start,
+          padding: padding,
+          constrained: constrained,
+        ),
         _scale = _FloatingOverlayScale.relative(
           minScale: minScale,
           maxScale: maxScale,
@@ -36,7 +39,9 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
               padding: padding,
             ).state,
           ),
-        );
+        ) {
+    _streamProcess();
+  }
 
   /// The controller for the [FloatingOverlay].
   ///
@@ -57,9 +62,12 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
 
     /// If the floating child's space to float will be limited by the maximum
     /// size that the FloatingOverlay can be.
-    bool? constrained,
-  })  : _offset = _FloatingOverlayOffset(start: start, padding: padding),
-        _constrained = constrained ?? false,
+    bool constrained = false,
+  })  : _offset = _FloatingOverlayOffset(
+          start: start,
+          padding: padding,
+          constrained: constrained,
+        ),
         _scale = _FloatingOverlayScale.absolute(
           maxSize: maxSize,
           minSize: minSize,
@@ -73,13 +81,23 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
               padding: padding,
             ).state,
           ),
-        );
+        ) {
+    _streamProcess();
+  }
+
+  void _streamProcess() {
+    _offset.stream.listen((offset) {
+      emit(state.copyWith(position: offset));
+    });
+    _scale.stream.listen((scale) {
+      emit(state.copyWith(scale: scale));
+    });
+  }
 
   static final _logger = Logger('FloatingOverlayController');
   final _FloatingOverlayOffset _offset;
   final _FloatingOverlayScale _scale;
-  final bool _constrained;
-  GlobalKey? _key;
+  final _key = GlobalKey();
   OverlayState? _overlay;
   OverlayEntry? _entry;
   Widget? _child;
@@ -87,15 +105,15 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   void _initState(
     BuildContext context,
     Widget floatingChild,
-    EdgeInsets newPadding,
-    GlobalKey key,
+    Rect limits,
   ) {
     _logger.info('Started');
-    _key = key;
-    _child = floatingChild;
-    _offset.init(newPadding, _constrained);
-    _offset.set(_offset.state, MediaQuery.of(context).size);
+    _child ??= floatingChild;
+    _offset.init(limits, MediaQuery.of(context).size);
     _overlay = Overlay.of(context);
+    _createInvisibleChild(_startChildSize);
+    _scale.init(_offset.floatingLimits!);
+    _offset.set(_offset.state, state.childRect.size);
   }
 
   void _dispose() {
@@ -105,6 +123,47 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _overlay = null;
     _logger.info('Disposed');
   }
+
+  void _createInvisibleChild(VoidCallback postFrameCallback) {
+    _logger.info('Creating invisible entry');
+    _entry = OverlayEntry(
+      builder: (context) {
+        WidgetsBinding.instance?.addPostFrameCallback((_) {
+          postFrameCallback();
+          _logger.info('Destroying invisible entry');
+          hide();
+        });
+        return Offstage(
+          offstage: true,
+          child: SizedBox.shrink(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: _floatingChild,
+            ),
+          ),
+        );
+      },
+    );
+    _overlay?.insert(_entry!);
+  }
+
+  void _startChildSize() {
+    _logger.info('Strating child size');
+    emit(state.copyWith(childSize: _childSize));
+  }
+
+  Size get _childSize {
+    final box = _key.currentContext!.findRenderObject()! as RenderBox;
+    return box.size;
+  }
+
+  /// Update the offset of the floating widget.
+  set offset(Offset global) => _offset.setGlobal(global, state);
+
+  /// Returns the constrained `Rect` in which the widget can float.
+  ///
+  /// This value is null until the [FloatingOverlay] is initiated.
+  Rect? get floatingLimits => _offset.floatingLimits;
 
   // Toggles the floating child's visibility.
   void toggle() {
@@ -121,7 +180,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _entry?.remove();
     if (dispose) _entry?.dispose();
     _entry = null;
-    _logger.info('Hidden overlay');
+    _logger.info('Entry removed');
   }
 
   // The floating child's visibility.
@@ -129,53 +188,57 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
 
   // Shows the floating child.
   void show() {
-    _logger.info('Showing overlay');
+    _logger.info('Showing entry');
     _entry = OverlayEntry(
       builder: (context) {
-        return _Reposition(
-          offsetController: _offset,
-          child: _Rescale(
-            childKey: _key!,
-            scaleController: _scale,
-            child: GestureDetector(
-              key: _key,
-              onScaleStart: (details) {
-                _scale.onStart(_offset, _key!);
-                _offset.onStart(_scale, _key!, details.focalPoint);
-              },
-              onScaleUpdate: (details) {
-                _scale.onUpdate(details.scale);
-                _offset.onUpdate(details.focalPoint);
-              },
-              child: floatingChild(),
-            ),
-          ),
-        );
+        return _entryWidget;
       },
     );
-
     _overlay?.insert(_entry!);
   }
 
-  Size get _childSize {
-    final _context = _key!.currentContext!;
-    final box = _context.findRenderObject() as RenderBox?;
-    return box?.size ?? Size.zero;
+  Widget get _entryWidget {
+    return _Reposition(
+      offsetController: _offset,
+      child: _Rescale(
+        data: state,
+        scaleController: _scale,
+        child: GestureDetector(
+          onScaleStart: (details) {
+            _scale.onStart();
+            _offset.onStart(details.focalPoint);
+          },
+          onScaleUpdate: (details) {
+            _scale.onUpdate(details.scale, state);
+            final previousScale = _scale._previousScale;
+            _offset.onUpdate(details.focalPoint, state, previousScale);
+          },
+          onScaleEnd: (_) {
+            _offset.onEnd();
+          },
+          child: Builder(
+            builder: (context) {
+              WidgetsBinding.instance?.addPostFrameCallback(
+                (_) => emit(
+                  state.copyWith(
+                    position: _offset.state,
+                    childSize: _childSize,
+                    scale: _scale.state,
+                  ),
+                ),
+              );
+              return _floatingChild;
+            },
+          ),
+        ),
+      ),
+    );
   }
 
-  Widget floatingChild() {
-    return Builder(
-      builder: (context) {
-        WidgetsBinding.instance?.addPostFrameCallback((_) {
-          final data = FloatingOverlayData(
-            position: _offset.state,
-            childSize: _childSize,
-            scale: _scale.state,
-          );
-          emit(data);
-        });
-        return _child ?? const SizedBox.shrink();
-      },
+  Widget get _floatingChild {
+    return Container(
+      key: _key,
+      child: _child ?? const SizedBox.shrink(),
     );
   }
 }

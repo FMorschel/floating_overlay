@@ -11,6 +11,8 @@ class FloatingOverlayData {
   final double scale;
   final Offset position;
 
+  Rect get childRect => position & (childSize * scale);
+
   @override
   String toString() {
     return 'FloatingOverlayData('
@@ -18,5 +20,19 @@ class FloatingOverlayData {
         'scale: $scale, '
         'position: $position'
         ')';
+  }
+
+  FloatingOverlayData copyWith({
+    Size? childSize,
+    double? scale,
+    Offset? position,
+  }) {
+    return FloatingOverlayData(
+      childSize: (childSize != Size.zero) && (childSize != null)
+          ? childSize
+          : this.childSize,
+      position: position ?? this.position,
+      scale: scale ?? this.scale,
+    );
   }
 }

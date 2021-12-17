@@ -71,48 +71,72 @@ class HomePage extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  child: const Text('Toggle Overlay'),
-                  onPressed: () {
-                    controller.toggle();
-                  },
-                ),
+              CustomButton(
+                title: 'Toggle Overlay',
+                onPressed: () {
+                  controller.toggle();
+                },
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  child: const Text('New Page'),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => const NewPage()),
-                    );
-                  },
-                ),
+              CustomButton(
+                title: 'Set Middle Screen Offset',
+                onPressed: () {
+                  final size = MediaQuery.of(context).size;
+                  final rect = Rect.fromPoints(
+                    Offset.zero,
+                    Offset(size.width, size.height),
+                  );
+                  controller.offset = rect.center;
+                },
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  child: const Text('New Page with AnimationController'),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => Provider<RouteObserver>(
-                          // There is a difference to initializing the
-                          // controller inside a Stateful Widget that has an
-                          // [AnimationController].
-                          create: (_) => routeObserver,
-                          child: const AnimationPage(),
-                        ),
+              CustomButton(
+                title: 'New Page',
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const NewPage()),
+                  );
+                },
+              ),
+              CustomButton(
+                title: 'New Page with AnimationController',
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Provider<RouteObserver>(
+                        // There is a difference to initializing the
+                        // controller inside a Stateful Widget that has an
+                        // [AnimationController].
+                        create: (_) => routeObserver,
+                        child: const AnimationPage(),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class CustomButton extends StatelessWidget {
+  const CustomButton({
+    Key? key,
+    required this.onPressed,
+    required this.title,
+  }) : super(key: key);
+
+  final VoidCallback onPressed;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ElevatedButton(
+        child: Text(title),
+        onPressed: onPressed,
       ),
     );
   }
