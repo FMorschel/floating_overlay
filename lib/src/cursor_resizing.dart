@@ -37,7 +37,6 @@ class _CursorResizing extends StatelessWidget {
           child: SizedBox(
             width: side.width,
             height: side.height,
-            child: Container(color: Colors.red),
           ),
         ),
       ),

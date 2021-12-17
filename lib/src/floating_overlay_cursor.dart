@@ -42,15 +42,10 @@ class _FloatingOverlayCursor {
     if (newScale != previousScale) {
       final newSize = size * newScale;
       final newRect = Alignment.center.inscribe(newSize, _startRect);
-      debugPrint(
-        'NewRect Offset:${newRect.topLeft}\n'
-        'OldRect Offset:${_startRect.topLeft}',
-      );
       _offset.onUpdateDelta(
         newRect.topLeft - _startRect.topLeft,
         data.childRect.size,
       );
-      debugPrint('newOffset: ${_offset.state}');
     }
   }
 
