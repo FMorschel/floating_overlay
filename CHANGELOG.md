@@ -1,4 +1,8 @@
 
+# 1.1.1 - 2021.12.20
+
+* Fixed bug `_cursorController` not initialized.
+
 # 1.1.0 - 2021.12.20
 
 * Now processing mouse updates!

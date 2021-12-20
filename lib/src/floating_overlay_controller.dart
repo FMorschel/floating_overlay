@@ -40,6 +40,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
             ).state,
           ),
         ) {
+    _cursorController = _FloatingOverlayCursor(scale: _scale, offset: _offset);
     _streamProcess();
   }
 
