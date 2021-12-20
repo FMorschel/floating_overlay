@@ -48,7 +48,7 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
 
   void onEnd() => _previousOffset = state;
 
-  /// Porcess the offset considering the received position and the current and 
+  /// Porcess the offset considering the received position and the current and
   /// previous size of the floating child.
   void onUpdate(
     Offset newOffset,
@@ -60,8 +60,8 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
     onUpdateDelta(delta, data.childRect.size);
   }
 
-  /// Returns half the difference between the previous scale and the current 
-  /// one, so that the scaling with fingers can occur evenly and from the 
+  /// Returns half the difference between the previous scale and the current
+  /// one, so that the scaling with fingers can occur evenly and from the
   /// center.
   Offset _scaleOffset(FloatingOverlayData data, double previousScale) {
     final previousSize = data.copyWith(scale: previousScale).childRect.size;
@@ -79,7 +79,7 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
     emit(_validValue(offset, size));
   }
 
-  /// Returns if the given offset is valid and returns it clamped inside the 
+  /// Returns if the given offset is valid and returns it clamped inside the
   /// constraints.
   Offset _validValue(Offset offset, Size childSize) {
     double? dx;

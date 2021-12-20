@@ -1,4 +1,10 @@
 
+# 1.1.0 - 2021.12.20
+
+* Now processing mouse updates!
+* Refactoring starting process.
+* New setters for offset and scale.
+
 # 1.0.5 - 2021.12.09
 
 * Better scaling considering constraints and more refactoring.

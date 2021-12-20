@@ -160,9 +160,9 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   }
 
   /// Returns the current offset of the floating widget.
-  /// 
-  /// If you are using the setter and looking for the same result, use the 
-  /// [stream] getter which gives a [FloatingOverlayData] and will update when 
+  ///
+  /// If you are using the setter and looking for the same result, use the
+  /// [stream] getter which gives a [FloatingOverlayData] and will update when
   /// the controller ends processing.
   Offset get offset => state.position;
 
@@ -172,9 +172,9 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   }
 
   /// Returns the current scale of the floating widget.
-  /// 
-  /// If you are using the setter and looking for the same result, use the 
-  /// [stream] getter which gives a [FloatingOverlayData] and will update when 
+  ///
+  /// If you are using the setter and looking for the same result, use the
+  /// [stream] getter which gives a [FloatingOverlayData] and will update when
   /// the controller ends processing.
   double get scale => state.scale;
 

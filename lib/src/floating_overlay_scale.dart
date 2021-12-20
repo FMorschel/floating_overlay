@@ -34,7 +34,7 @@ class _FloatingOverlayScale extends Cubit<double> {
 
   void onStart() => _previousScale = state;
 
-  /// This receives the Offset delta and processes that as to scale that amout 
+  /// This receives the Offset delta and processes that as to scale that amout
   /// of pixels to the widget.
   void onUpdateDelta(Offset delta, FloatingOverlayData data) {
     final changed = Size(delta.dx, delta.dy);
@@ -45,7 +45,7 @@ class _FloatingOverlayScale extends Cubit<double> {
     onUpdate(newSize.div(data.childRect.size), data);
   }
 
-  /// This receives the new scale and processes if the scale needs to be 
+  /// This receives the new scale and processes if the scale needs to be
   /// clamped.
   void onUpdate(double scale, FloatingOverlayData data) {
     final childSize = data.childSize;

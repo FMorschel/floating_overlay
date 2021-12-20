@@ -14,14 +14,14 @@ class _FloatingOverlayCursor {
   /// Returns the actual main direction where the mouse is going.
   ///
   /// E.g. `_Side.left`? `Offset(X.Y, 0.0)`.
-  /// 
+  ///
   /// E.g. `_Side.topLeft`?
   /// It's going to return where the mouse has gone further.
-  /// 
+  ///
   /// `final delta = newOffset - _offset._startOffset`
-  /// 
+  ///
   /// `if (delta.dx.abs() > delta.dy.abs()) return Offset(X.Y, 0.0)`
-  /// 
+  ///
   /// `else return Offset(0.0, X.Y)`
   Offset mainDirectionDelta(Offset newOffset, _Side side) {
     final delta = newOffset - _offset._startOffset;
@@ -44,7 +44,7 @@ class _FloatingOverlayCursor {
     _startRect = data.childRect;
   }
 
-  /// Just as the gesture detector around the child, this tries to update the 
+  /// Just as the gesture detector around the child, this tries to update the
   /// scale and then the offset.
   void onUpdate(Offset delta, FloatingOverlayData data) {
     final size = data.childSize;
