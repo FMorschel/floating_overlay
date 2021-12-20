@@ -17,6 +17,7 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
   Offset _startOffset;
   Rect? floatingLimits;
 
+  /// Initiates this instance by processing the floating limits given.
   void init(Rect limits, Size screenSize) {
     if (_constrained) {
       floatingLimits = Rect.fromLTRB(
@@ -37,11 +38,7 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
     }
   }
 
-  void set(Offset offset, Size childSize) {
-    emit(_validValue(offset, childSize));
-    onEnd();
-  }
-
+  /// Sets the current offset to be the given, clamped to the constraints.
   void setGlobal(Offset newOffset, FloatingOverlayData data) {
     emit(_validValue(newOffset, data.childRect.size));
     onEnd();
@@ -51,6 +48,8 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
 
   void onEnd() => _previousOffset = state;
 
+  /// Porcess the offset considering the received position and the current and 
+  /// previous size of the floating child.
   void onUpdate(
     Offset newOffset,
     FloatingOverlayData data,
@@ -61,6 +60,9 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
     onUpdateDelta(delta, data.childRect.size);
   }
 
+  /// Returns half the difference between the previous scale and the current 
+  /// one, so that the scaling with fingers can occur evenly and from the 
+  /// center.
   Offset _scaleOffset(FloatingOverlayData data, double previousScale) {
     final previousSize = data.copyWith(scale: previousScale).childRect.size;
     final currentSize = data.childRect.size;
@@ -71,11 +73,14 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
     return Offset(difference.width / 2, difference.height / 2);
   }
 
+  /// Updates the offset by the given Offset delta.
   void onUpdateDelta(Offset delta, Size size) {
     final offset = (_previousOffset + delta);
     emit(_validValue(offset, size));
   }
 
+  /// Returns if the given offset is valid and returns it clamped inside the 
+  /// constraints.
   Offset _validValue(Offset offset, Size childSize) {
     double? dx;
     double? dy;

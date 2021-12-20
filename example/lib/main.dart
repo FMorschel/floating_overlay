@@ -78,7 +78,7 @@ class HomePage extends StatelessWidget {
                 },
               ),
               CustomButton(
-                title: 'Set Middle Screen Offset',
+                title: 'Set Screen Center Offset',
                 onPressed: () {
                   final size = MediaQuery.of(context).size;
                   final rect = Rect.fromPoints(
@@ -86,6 +86,12 @@ class HomePage extends StatelessWidget {
                     Offset(size.width, size.height),
                   );
                   controller.offset = rect.center;
+                },
+              ),
+              CustomButton(
+                title: 'Set Scale to 2.0',
+                onPressed: () {
+                  controller.scale = 2.0;
                 },
               ),
               CustomButton(

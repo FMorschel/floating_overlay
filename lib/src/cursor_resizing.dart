@@ -22,15 +22,9 @@ class _CursorResizing extends StatelessWidget {
       right: side.rightDistance,
       bottom: side.bottomDistance,
       child: GestureDetector(
-        onPanStart: side.diagonal ? onStart : null,
-        onPanUpdate: side.diagonal ? onUpdate : null,
-        onPanEnd: side.diagonal ? onEnd : null,
-        onVerticalDragStart: side.vertical ? onStart : null,
-        onVerticalDragUpdate: side.vertical ? onUpdate : null,
-        onVerticalDragEnd: side.vertical ? onEnd : null,
-        onHorizontalDragStart: side.horizontal ? onStart : null,
-        onHorizontalDragUpdate: side.horizontal ? onUpdate : null,
-        onHorizontalDragEnd: side.horizontal ? onEnd : null,
+        onPanStart: onStart,
+        onPanUpdate: onUpdate,
+        onPanEnd: onEnd,
         child: MouseRegion(
           cursor: side.cursor,
           opaque: true,

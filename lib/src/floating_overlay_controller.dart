@@ -115,7 +115,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _overlay = Overlay.of(context);
     _createInvisibleChild(_startChildSize);
     _scale.init(floatingLimits!);
-    _offset.set(_offset.state, state.childRect.size);
+    _offset.setGlobal(_offset.state, state);
   }
 
   void _dispose() {
@@ -159,8 +159,29 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     return box.size;
   }
 
+  /// Returns the current offset of the floating widget.
+  /// 
+  /// If you are using the setter and looking for the same result, use the 
+  /// [stream] getter which gives a [FloatingOverlayData] and will update when 
+  /// the controller ends processing.
+  Offset get offset => state.position;
+
   /// Update the offset of the floating widget.
-  set offset(Offset global) => _offset.setGlobal(global, state);
+  set offset(Offset global) {
+    _offset.setGlobal(global, state);
+  }
+
+  /// Returns the current scale of the floating widget.
+  /// 
+  /// If you are using the setter and looking for the same result, use the 
+  /// [stream] getter which gives a [FloatingOverlayData] and will update when 
+  /// the controller ends processing.
+  double get scale => state.scale;
+
+  /// Update the scale of the floating widget.
+  set scale(double scale) {
+    _scale.onUpdate(scale, state);
+  }
 
   /// Returns the constrained `Rect` in which the widget can float.
   ///
@@ -193,13 +214,13 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _logger.info('Showing entry');
     _entry = OverlayEntry(
       builder: (context) {
-        return _entryWidget;
+        return _entryProcesWidgets;
       },
     );
     _overlay?.insert(_entry!);
   }
 
-  Widget get _entryWidget {
+  Widget get _entryProcesWidgets {
     return _Reposition(
       offsetController: _offset,
       child: Stack(
@@ -255,15 +276,6 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   }
 
   Widget get gestureDetector {
-    WidgetsBinding.instance?.addPostFrameCallback(
-      (_) => emit(
-        state.copyWith(
-          position: _offset.state,
-          childSize: _childSize,
-          scale: _scale.state,
-        ),
-      ),
-    );
     return GestureDetector(
       onScaleStart: (details) {
         _scale.onStart();

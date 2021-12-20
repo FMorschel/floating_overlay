@@ -1,7 +1,7 @@
 part of 'floating_overlay.dart';
 
-class FloatingOverlayData {
-  FloatingOverlayData({
+class FloatingOverlayData extends Equatable {
+  const FloatingOverlayData({
     required this.childSize,
     required this.scale,
     required this.position,
@@ -35,4 +35,7 @@ class FloatingOverlayData {
       scale: scale ?? this.scale,
     );
   }
+
+  @override
+  List<Object?> get props => [childSize, scale, position];
 }
