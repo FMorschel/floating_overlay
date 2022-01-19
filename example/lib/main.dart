@@ -14,7 +14,7 @@ class App extends StatelessWidget {
     // Create one of this and pass it to the FloatingOverlay, to be able to pop
     // and push new pages and the floating overlay don't continue showing in
     // all new pages on top and show again when you come back
-    final routeObserver = RouteObserver<ModalRoute<void>>();
+    final routeObserver = RouteObserver();
     return MaterialApp(
       title: 'Floating Overlay Example',
       navigatorObservers: [routeObserver], // Give it to the main materialApp

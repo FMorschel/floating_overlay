@@ -1,4 +1,9 @@
 
+# 1.2.0 - 2022.01.19
+
+* Fixed bug `Multiple widgets using the same GlobalKey`.
+* Rotationing screen now fixed.
+
 # 1.1.1 - 2021.12.20
 
 * Fixed bug `_cursorController` not initialized.

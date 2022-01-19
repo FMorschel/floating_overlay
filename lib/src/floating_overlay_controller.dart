@@ -113,9 +113,9 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _logger.info('Started');
     _child ??= floatingChild;
     _offset.init(limits, MediaQuery.of(context).size);
-    _overlay = Overlay.of(context);
-    _createInvisibleChild(_startChildSize);
     _scale.init(floatingLimits!);
+    _overlay = Overlay.of(context);
+    if (!isFloating) _createInvisibleChild(_startChildSize);
     _offset.setGlobal(_offset.state, state);
   }
 
@@ -295,14 +295,10 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   }
 
   Widget get _floatingChild {
+    _key = GlobalKey();
     return Container(
-      key: _key.currentWidget != null ? _key : _newKey,
+      key: _key,
       child: _child ?? const SizedBox.shrink(),
     );
-  }
-
-  GlobalKey get _newKey {
-    _key = GlobalKey();
-    return _key;
   }
 }

@@ -113,20 +113,18 @@ class _FloatingOverlayState extends State<FloatingOverlay> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      key: key,
-      onWillPop: () async {
-        controller.hide();
-        return true;
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        return LayoutBuilder(
+          key: key,
+          builder: (context, constraints) {
+            WidgetsBinding.instance?.addPostFrameCallback(
+              (_) => startController(context, constraints),
+            );
+            return widget.child ?? empty;
+          },
+        );
       },
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          WidgetsBinding.instance?.addPostFrameCallback(
-            (_) => startController(context, constraints),
-          );
-          return widget.child ?? empty;
-        },
-      ),
     );
   }
 }
