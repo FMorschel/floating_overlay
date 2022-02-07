@@ -51,7 +51,8 @@ class FloatingOverlay extends StatefulWidget {
   State<FloatingOverlay> createState() => _FloatingOverlayState();
 }
 
-class _FloatingOverlayState extends State<FloatingOverlay> with RouteAware {
+class _FloatingOverlayState extends State<FloatingOverlay>
+    with RouteAware, TickerProviderStateMixin {
   static const empty = SizedBox.shrink();
 
   late final FloatingOverlayController controller;
@@ -64,7 +65,11 @@ class _FloatingOverlayState extends State<FloatingOverlay> with RouteAware {
     final _endOffset = endOffset(offset, constraints.biggest);
     final limits = Rect.fromPoints(offset, _endOffset);
     final child = widget.floatingChild ?? empty;
-    controller._initState(context, child, limits);
+    controller._initState(
+      context: context,
+      floatingChild: child,
+      limits: limits,
+    );
   }
 
   Offset widgetOffset() {
