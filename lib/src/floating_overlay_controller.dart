@@ -105,11 +105,11 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   OverlayEntry? _entry;
   Widget? _child;
 
-  void _initState(
-    BuildContext context,
-    Widget floatingChild,
-    Rect limits,
-  ) {
+  void _initState({
+    required BuildContext context,
+    required Widget floatingChild,
+    required Rect limits,
+  }) {
     _logger.info('Started');
     _child ??= floatingChild;
     _offset.init(limits, MediaQuery.of(context).size);
@@ -231,50 +231,58 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
             scaleController: _scale,
             child: gestureDetector,
           ),
-          _CursorResizing(
-            side: _Side.left,
-            controller: _cursorController,
-            data: () => state,
-          ),
-          _CursorResizing(
-            side: _Side.top,
-            controller: _cursorController,
-            data: () => state,
-          ),
-          _CursorResizing(
-            side: _Side.right,
-            controller: _cursorController,
-            data: () => state,
-          ),
-          _CursorResizing(
-            side: _Side.bottom,
-            controller: _cursorController,
-            data: () => state,
-          ),
-          _CursorResizing(
-            side: _Side.topLeft,
-            controller: _cursorController,
-            data: () => state,
-          ),
-          _CursorResizing(
-            side: _Side.topRight,
-            controller: _cursorController,
-            data: () => state,
-          ),
-          _CursorResizing(
-            side: _Side.bottomLeft,
-            controller: _cursorController,
-            data: () => state,
-          ),
-          _CursorResizing(
-            side: _Side.bottomRight,
-            controller: _cursorController,
-            data: () => state,
-          ),
+          ..._sides,
+          ..._corners,
         ],
       ),
     );
   }
+
+  List<_CursorResizing> get _sides => [
+        _CursorResizing(
+          side: _Side.left,
+          controller: _cursorController,
+          data: () => state,
+        ),
+        _CursorResizing(
+          side: _Side.top,
+          controller: _cursorController,
+          data: () => state,
+        ),
+        _CursorResizing(
+          side: _Side.right,
+          controller: _cursorController,
+          data: () => state,
+        ),
+        _CursorResizing(
+          side: _Side.bottom,
+          controller: _cursorController,
+          data: () => state,
+        ),
+      ];
+
+  List<_CursorResizing> get _corners => [
+        _CursorResizing(
+          side: _Side.topLeft,
+          controller: _cursorController,
+          data: () => state,
+        ),
+        _CursorResizing(
+          side: _Side.topRight,
+          controller: _cursorController,
+          data: () => state,
+        ),
+        _CursorResizing(
+          side: _Side.bottomLeft,
+          controller: _cursorController,
+          data: () => state,
+        ),
+        _CursorResizing(
+          side: _Side.bottomRight,
+          controller: _cursorController,
+          data: () => state,
+        ),
+      ];
 
   Widget get gestureDetector {
     return GestureDetector(
