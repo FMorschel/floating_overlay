@@ -5,11 +5,13 @@ class FloatingOverlayData extends Equatable {
     required this.childSize,
     required this.scale,
     required this.position,
+    required this.rotation,
   });
 
   final Size childSize;
   final double scale;
   final Offset position;
+  final double rotation;
 
   Rect get childRect => position & (childSize * scale);
 
@@ -26,6 +28,7 @@ class FloatingOverlayData extends Equatable {
     Size? childSize,
     double? scale,
     Offset? position,
+    double? rotation,
   }) {
     return FloatingOverlayData(
       childSize: (childSize != Size.zero) && (childSize != null)
@@ -33,6 +36,7 @@ class FloatingOverlayData extends Equatable {
           : this.childSize,
       position: position ?? this.position,
       scale: scale ?? this.scale,
+      rotation: rotation ?? this.rotation,
     );
   }
 

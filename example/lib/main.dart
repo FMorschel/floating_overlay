@@ -42,6 +42,7 @@ class HomePage extends StatelessWidget {
       minSize: const Size(100, 100),
       padding: const EdgeInsets.all(20.0),
       constrained: true,
+      rotation: FloatingOverlayRotation.fullRotation,
     );
     final routeObserver = Provider.of<RouteObserver>(context, listen: false);
     return Scaffold(

@@ -21,6 +21,12 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     /// If the floating child's space to float will be limited by the maximum
     /// size that the FloatingOverlay can be.
     bool constrained = false,
+
+    /// Initial rotation in degrees.
+    double? initialRotation,
+
+    /// Rotation range values for the floating widget.
+    FloatingOverlayRotation rotation = FloatingOverlayRotation.noRotation,
   })  : _offset = _FloatingOverlayOffset(
           start: start,
           padding: padding,
@@ -30,6 +36,10 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
           minScale: minScale,
           maxScale: maxScale,
         ),
+        _rotation = _FloatingOverlayRotation.fromRotationValues(
+          initialState: initialRotation,
+          rotation: rotation,
+        ),
         super(
           FloatingOverlayData(
             childSize: Size.zero,
@@ -38,6 +48,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
               start: start,
               padding: padding,
             ).state,
+            rotation: initialRotation ?? 0,
           ),
         ) {
     _cursorController = _FloatingOverlayCursor(scale: _scale, offset: _offset);
@@ -64,6 +75,12 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     /// If the floating child's space to float will be limited by the maximum
     /// size that the FloatingOverlay can be.
     bool constrained = false,
+
+    /// Initial rotation in degrees.
+    double? initialRotation,
+
+    /// Rotation range values for the floating widget.
+    FloatingOverlayRotation rotation = FloatingOverlayRotation.noRotation,
   })  : _offset = _FloatingOverlayOffset(
           start: start,
           padding: padding,
@@ -73,6 +90,10 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
           maxSize: maxSize,
           minSize: minSize,
         ),
+        _rotation = _FloatingOverlayRotation.fromRotationValues(
+          initialState: initialRotation,
+          rotation: rotation,
+        ),
         super(
           FloatingOverlayData(
             childSize: Size.zero,
@@ -81,6 +102,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
               start: start,
               padding: padding,
             ).state,
+            rotation: initialRotation ?? 0,
           ),
         ) {
     _cursorController = _FloatingOverlayCursor(scale: _scale, offset: _offset);
@@ -94,10 +116,14 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _scale.stream.listen((scale) {
       emit(state.copyWith(scale: scale));
     });
+    _rotation.stream.listen((rotation) {
+      emit(state.copyWith(rotation: rotation));
+    });
   }
 
   static final _logger = Logger('FloatingOverlayController');
   late final _FloatingOverlayCursor _cursorController;
+  final _FloatingOverlayRotation _rotation;
   final _FloatingOverlayOffset _offset;
   final _FloatingOverlayScale _scale;
   GlobalKey _key = GlobalKey();
@@ -224,16 +250,20 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   Widget get _entryProcesWidgets {
     return _Reposition(
       offsetController: _offset,
-      child: Stack(
-        children: [
-          _Rescale(
-            data: state,
-            scaleController: _scale,
-            child: gestureDetector,
-          ),
-          ..._sides,
-          ..._corners,
-        ],
+      child: _Rotate(
+        rotationController: _rotation,
+        data: () => state,
+        child: Stack(
+          children: [
+            _Rescale(
+              data: state,
+              scaleController: _scale,
+              child: gestureDetector,
+            ),
+            if (_scale.canScale) ..._sides,
+            if (_scale.canScale) ..._corners,
+          ],
+        ),
       ),
     );
   }
@@ -263,22 +293,22 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
 
   List<_CursorResizing> get _corners => [
         _CursorResizing(
-          side: _Side.topLeft,
+          side: _rotation.canRotate ? _Side.topLeft : _Side.topLeft,
           controller: _cursorController,
           data: () => state,
         ),
         _CursorResizing(
-          side: _Side.topRight,
+          side: _rotation.canRotate ? _Side.topLeft : _Side.topRight,
           controller: _cursorController,
           data: () => state,
         ),
         _CursorResizing(
-          side: _Side.bottomLeft,
+          side: _rotation.canRotate ? _Side.topLeft : _Side.bottomLeft,
           controller: _cursorController,
           data: () => state,
         ),
         _CursorResizing(
-          side: _Side.bottomRight,
+          side: _rotation.canRotate ? _Side.topLeft : _Side.bottomRight,
           controller: _cursorController,
           data: () => state,
         ),
@@ -292,10 +322,12 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
       },
       onScaleUpdate: (details) {
         _scale.onUpdate(details.scale, state);
+        _rotation.onUpdate(details.rotation / (2 * pi) * 360, state);
         final previousScale = _scale._previousScale;
         _offset.onUpdate(details.focalPoint, state, previousScale);
       },
       onScaleEnd: (_) {
+        _rotation.onEnd();
         _offset.onEnd();
       },
       child: _floatingChild,

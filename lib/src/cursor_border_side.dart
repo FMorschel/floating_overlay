@@ -39,6 +39,7 @@ class _Side {
         leftDistance: _defaultWidth,
         rightDistance: _defaultWidth,
       );
+
   static _Side get topLeft => const _Side._(
         cursor: SystemMouseCursors.resizeUpLeftDownRight,
         width: _defaultWidth,

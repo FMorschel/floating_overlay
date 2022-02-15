@@ -21,4 +21,5 @@ linter:
 
 analyzer:
   errors:
+    missing_enum_constant_in_switch: error
     missing_required_param: error

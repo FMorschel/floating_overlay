@@ -26,6 +26,8 @@ class _FloatingOverlayScale extends Cubit<double> {
   double _previousScale = 1.0;
   Size? _sizeLimit;
 
+  bool get canScale => (_minScale != _maxScale) || (_minSize != _maxSize);
+
   void init(Rect constraints) {
     final height = constraints.bottom - constraints.top;
     final width = constraints.right - constraints.left;
