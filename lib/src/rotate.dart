@@ -5,12 +5,12 @@ class _Rotate extends StatelessWidget {
     Key? key,
     required this.child,
     required this.rotationController,
-    required this.data,
+    required this.entryData,
   }) : super(key: key);
 
   final Widget child;
   final _FloatingOverlayRotation rotationController;
-  final FloatingOverlayData Function() data;
+  final FloatingOverlayData Function() entryData;
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +19,31 @@ class _Rotate extends StatelessWidget {
       stream: rotationController.stream,
       builder: (context, snapshot) {
         final rotation = snapshot.data!;
-        return Transform.rotate(
-          angle: rotation * (2 * pi) / 360,
-          alignment: Alignment.center,
-          child: child,
+        Size? size;
+        if (entryData().childSize != Size.zero) {
+          size = entryData().rotatedRect.size;
+        }
+        return SizedBox.fromSize(
+          size: size,
+          child: Builder(
+            builder: (context) {
+              if (size != null) {
+                return Center(
+                  child: Transform.rotate(
+                    angle: rotation * (2 * pi) / 360,
+                    alignment: Alignment.center,
+                    child: child,
+                  ),
+                );
+              } else {
+                return Transform.rotate(
+                  angle: rotation * (2 * pi) / 360,
+                  alignment: Alignment.center,
+                  child: child,
+                );
+              }
+            },
+          ),
         );
       },
     );

@@ -198,6 +198,18 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _offset.setGlobal(global, state);
   }
 
+  /// Returns the current offset of the floating widget.
+  ///
+  /// If you are using the setter and looking for the same result, use the
+  /// [stream] getter which gives a [FloatingOverlayData] and will update when
+  /// the controller ends processing.
+  double get rotation => state.rotation;
+
+  /// Update the offset of the floating widget.
+  set rotation(double degrees) {
+    _rotation.set(degrees, state);
+  }
+
   /// Returns the current scale of the floating widget.
   ///
   /// If you are using the setter and looking for the same result, use the
@@ -252,11 +264,11 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
       offsetController: _offset,
       child: _Rotate(
         rotationController: _rotation,
-        data: () => state,
+        entryData: () => state,
         child: Stack(
           children: [
             _Rescale(
-              data: state,
+              entryData: state,
               scaleController: _scale,
               child: gestureDetector,
             ),

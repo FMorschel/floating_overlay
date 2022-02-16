@@ -11,6 +11,7 @@ part 'floating_overlay_offset.dart';
 part 'floating_overlay_rotate.dart';
 part 'floating_overlay_scale.dart';
 part 'floating_overlay_data.dart';
+part 'rotaded_size.dart';
 part 'reposition.dart';
 part 'rescale.dart';
 part 'rotate.dart';

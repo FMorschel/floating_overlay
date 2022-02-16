@@ -15,11 +15,18 @@ class FloatingOverlayData extends Equatable {
 
   Rect get childRect => position & (childSize * scale);
 
+  Rect get rotatedRect {
+    final rotatedSize = (childSize * scale).rotationed(rotation);
+    final size = rotatedSize - childRect.size;
+    return (position - (size as Offset) / 2) & rotatedSize;
+  }
+
   @override
   String toString() {
     return 'FloatingOverlayData('
         'childSize: $childSize, '
         'scale: $scale, '
+        'rotation: $rotation, '
         'position: $position'
         ')';
   }
@@ -41,5 +48,5 @@ class FloatingOverlayData extends Equatable {
   }
 
   @override
-  List<Object?> get props => [childSize, scale, position];
+  List<Object?> get props => [childSize, scale, position, rotation];
 }

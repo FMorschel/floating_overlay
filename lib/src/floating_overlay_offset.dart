@@ -40,7 +40,7 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
 
   /// Sets the current offset to be the given, clamped to the constraints.
   void setGlobal(Offset newOffset, FloatingOverlayData data) {
-    emit(_validValue(newOffset, data.childRect.size));
+    emit(_validValue(newOffset, data.rotatedRect.size));
     onEnd();
   }
 
@@ -57,15 +57,15 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
   ) {
     final scaleOffset = _scaleOffset(data, previousScale);
     final delta = newOffset - _startOffset - scaleOffset;
-    onUpdateDelta(delta, data.childRect.size);
+    onUpdateDelta(delta, data.rotatedRect.size);
   }
 
   /// Returns half the difference between the previous scale and the current
   /// one, so that the scaling with fingers can occur evenly and from the
   /// center.
   Offset _scaleOffset(FloatingOverlayData data, double previousScale) {
-    final previousSize = data.copyWith(scale: previousScale).childRect.size;
-    final currentSize = data.childRect.size;
+    final previousSize = data.copyWith(scale: previousScale).rotatedRect.size;
+    final currentSize = data.rotatedRect.size;
     final difference = Size(
       currentSize.width - previousSize.width,
       currentSize.height - previousSize.height,

@@ -79,6 +79,12 @@ class HomePage extends StatelessWidget {
                 },
               ),
               CustomButton(
+                title: 'Set 45º',
+                onPressed: () {
+                  controller.rotation = 45;
+                },
+              ),
+              CustomButton(
                 title: 'Set Screen Center Offset',
                 onPressed: () {
                   final size = MediaQuery.of(context).size;

@@ -70,6 +70,11 @@ class _FloatingOverlayRotation extends Cubit<double> {
     emit((_lastRotation + rotation).clamp(_min, _max));
   }
 
+  void set(double rotation, FloatingOverlayData data) {
+    emit(rotation.clamp(_min, _max));
+    onEnd();
+  }
+
   void onEnd() {
     _lastRotation = state;
   }
@@ -77,65 +82,6 @@ class _FloatingOverlayRotation extends Cubit<double> {
   void rotateWithOffset(Offset offset, FloatingOverlayData data) {
     final rotation = _degreeFrom(offset);
     onUpdate(_lastRotation - rotation, data);
-  }
-
-  Size rotationed(Size size, double rotation) {
-    double degrees = rotation % 360;
-    if (degrees.isNegative) degrees *= -1;
-    final quadrant = _quadrantFrom(degrees);
-    if ((degrees % 90) == 0) {
-      if ((degrees ~/ 90).isEven) {
-        return size;
-      } else {
-        return size.flipped;
-      }
-    }
-    final radians = degrees * (2 * pi) / 360;
-    late double newWidth;
-    late double newHeight;
-    switch (quadrant) {
-      case _Quadrant.first:
-        newWidth = _newSideCosine(radians, size.width, size.height);
-        newHeight = _newSideSine(radians, size.width, size.height);
-        break;
-      case _Quadrant.second:
-        newHeight = _newSideCosine(radians - pi, size.width, size.height);
-        newWidth = _newSideSine(radians, size.width, size.height);
-        break;
-      case _Quadrant.third:
-        newWidth = _newSideCosine(radians - pi, size.width, size.height);
-        newHeight = _newSideSine(radians - pi, size.width, size.height);
-        break;
-      case _Quadrant.fourth:
-        newHeight = _newSideCosine(radians, size.width, size.height);
-        newWidth = _newSideSine(radians - pi, size.width, size.height);
-        break;
-    }
-    return Size(newWidth + size.width, newHeight + size.height);
-  }
-
-  double _newSideSine(
-    double rotation,
-    double hypotenuse1,
-    double hypotenuse2,
-  ) {
-    return _opposite(hypotenuse1, rotation) + _opposite(hypotenuse2, rotation);
-  }
-
-  double _newSideCosine(
-    double rotation,
-    double hypotenuse1,
-    double hypotenuse2,
-  ) {
-    return _adjacent(hypotenuse1, rotation) + _adjacent(hypotenuse2, rotation);
-  }
-
-  double _adjacent(double hypotenuse, double degrees) {
-    return cos(degrees) * hypotenuse;
-  }
-
-  double _opposite(double hypotenuse, double degrees) {
-    return sin(degrees) * hypotenuse;
   }
 
   double _degreeFrom(Offset offset) {
@@ -187,20 +133,6 @@ class _FloatingOverlayRotation extends Cubit<double> {
       } else {
         return _Quadrant.third;
       }
-    }
-  }
-
-  _Quadrant _quadrantFrom(double rotation) {
-    double degrees = rotation % 360;
-    if (degrees.isNegative) degrees *= -1;
-    if (degrees < 90) {
-      return _Quadrant.first;
-    } else if (degrees < 180) {
-      return _Quadrant.second;
-    } else if (degrees < 270) {
-      return _Quadrant.third;
-    } else {
-      return _Quadrant.fourth;
     }
   }
 }

@@ -5,12 +5,12 @@ class _Rescale extends StatelessWidget {
     Key? key,
     required this.child,
     required this.scaleController,
-    required this.data,
+    required this.entryData,
   }) : super(key: key);
 
   final Widget child;
   final _FloatingOverlayScale scaleController;
-  final FloatingOverlayData data;
+  final FloatingOverlayData entryData;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class _Rescale extends StatelessWidget {
       builder: (context, snapshot) {
         final scale = snapshot.data!;
         Size? size;
-        if (data.childSize != Size.zero) size = data.childSize * scale;
+        if (entryData.childSize != Size.zero) size = entryData.childSize * scale;
         return SizedBox.fromSize(
           size: size,
           child: child,
