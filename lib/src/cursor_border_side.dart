@@ -69,6 +69,35 @@ class _Side {
         bottomDistance: 0,
       );
 
+  static _Side get rotateTopLeft => const _Side._(
+        cursor: SystemMouseCursors.none,
+        width: _defaultWidth,
+        height: _defaultWidth,
+        leftDistance: 0,
+        topDistance: 0,
+      );
+  static _Side get rotateTopRight => const _Side._(
+        cursor: SystemMouseCursors.none,
+        width: _defaultWidth,
+        height: _defaultWidth,
+        rightDistance: 0,
+        topDistance: 0,
+      );
+  static _Side get rotateBottomLeft => const _Side._(
+        cursor: SystemMouseCursors.none,
+        width: _defaultWidth,
+        height: _defaultWidth,
+        leftDistance: 0,
+        bottomDistance: 0,
+      );
+  static _Side get rotateBottomRight => const _Side._(
+        cursor: SystemMouseCursors.none,
+        width: _defaultWidth,
+        height: _defaultWidth,
+        rightDistance: 0,
+        bottomDistance: 0,
+      );
+
   static const _defaultWidth = 3.0;
 
   final MouseCursor cursor;
@@ -83,6 +112,10 @@ class _Side {
     final primaria = cursor == SystemMouseCursors.resizeUpLeftDownRight;
     final secundaria = cursor == SystemMouseCursors.resizeUpRightDownLeft;
     return primaria || secundaria;
+  }
+
+  bool get rotation {
+    return cursor == SystemMouseCursors.none;
   }
 
   bool get vertical {

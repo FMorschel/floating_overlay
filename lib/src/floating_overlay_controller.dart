@@ -264,6 +264,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
       offsetController: _offset,
       child: _Rotate(
         rotationController: _rotation,
+        scaleController: _scale,
         entryData: () => state,
         child: Stack(
           children: [
@@ -305,22 +306,23 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
 
   List<_CursorResizing> get _corners => [
         _CursorResizing(
-          side: _rotation.canRotate ? _Side.topLeft : _Side.topLeft,
+          side: _rotation.canRotate ? _Side.rotateTopLeft : _Side.topLeft,
           controller: _cursorController,
           data: () => state,
         ),
         _CursorResizing(
-          side: _rotation.canRotate ? _Side.topLeft : _Side.topRight,
+          side: _rotation.canRotate ? _Side.rotateTopRight : _Side.topRight,
           controller: _cursorController,
           data: () => state,
         ),
         _CursorResizing(
-          side: _rotation.canRotate ? _Side.topLeft : _Side.bottomLeft,
+          side: _rotation.canRotate ? _Side.rotateBottomLeft : _Side.bottomLeft,
           controller: _cursorController,
           data: () => state,
         ),
         _CursorResizing(
-          side: _rotation.canRotate ? _Side.topLeft : _Side.bottomRight,
+          side:
+              _rotation.canRotate ? _Side.rotateBottomRight : _Side.bottomRight,
           controller: _cursorController,
           data: () => state,
         ),
