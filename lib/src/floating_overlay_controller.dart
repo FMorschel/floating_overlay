@@ -21,7 +21,11 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     /// If the floating child's space to float will be limited by the maximum
     /// size that the FloatingOverlay can be.
     bool constrained = false,
-  })  : _offset = _FloatingOverlayOffset(
+
+    /// Cursor detection pixel area.
+    double? cursorArea,
+  })  : _cursorArea = cursorArea,
+        _offset = _FloatingOverlayOffset(
           start: start,
           padding: padding,
           constrained: constrained,
@@ -64,7 +68,11 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     /// If the floating child's space to float will be limited by the maximum
     /// size that the FloatingOverlay can be.
     bool constrained = false,
-  })  : _offset = _FloatingOverlayOffset(
+
+    /// Cursor detection pixel area.
+    double? cursorArea,
+  })  : _cursorArea = cursorArea,
+        _offset = _FloatingOverlayOffset(
           start: start,
           padding: padding,
           constrained: constrained,
@@ -100,6 +108,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   late final _FloatingOverlayCursor _cursorController;
   final _FloatingOverlayOffset _offset;
   final _FloatingOverlayScale _scale;
+  final double? _cursorArea;
   GlobalKey _key = GlobalKey();
   OverlayState? _overlay;
   OverlayEntry? _entry;
@@ -131,7 +140,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _logger.info('Creating invisible entry');
     _entry = OverlayEntry(
       builder: (context) {
-        WidgetsBinding.instance?.addPostFrameCallback((_) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
           postFrameCallback();
           _logger.info('Destroying invisible entry');
           hide();
@@ -235,41 +244,49 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
             side: _Side.left,
             controller: _cursorController,
             data: () => state,
+            area: _cursorArea,
           ),
           _CursorResizing(
             side: _Side.top,
             controller: _cursorController,
             data: () => state,
+            area: _cursorArea,
           ),
           _CursorResizing(
             side: _Side.right,
             controller: _cursorController,
             data: () => state,
+            area: _cursorArea,
           ),
           _CursorResizing(
             side: _Side.bottom,
             controller: _cursorController,
             data: () => state,
+            area: _cursorArea,
           ),
           _CursorResizing(
             side: _Side.topLeft,
             controller: _cursorController,
             data: () => state,
+            area: _cursorArea,
           ),
           _CursorResizing(
             side: _Side.topRight,
             controller: _cursorController,
             data: () => state,
+            area: _cursorArea,
           ),
           _CursorResizing(
             side: _Side.bottomLeft,
             controller: _cursorController,
             data: () => state,
+            area: _cursorArea,
           ),
           _CursorResizing(
             side: _Side.bottomRight,
             controller: _cursorController,
             data: () => state,
+            area: _cursorArea,
           ),
         ],
       ),

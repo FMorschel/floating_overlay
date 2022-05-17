@@ -6,21 +6,23 @@ class _CursorResizing extends StatelessWidget {
     required this.side,
     required this.controller,
     required this.data,
-    this.width,
+    required this.area,
   }) : super(key: key);
 
   final _Side side;
-  final double? width;
+  final double? area;
   final FloatingOverlayData Function() data;
   final _FloatingOverlayCursor controller;
+
+  double? _sideSize(double? distance) => area ?? distance;
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: side.leftDistance,
-      top: side.topDistance,
-      right: side.rightDistance,
-      bottom: side.bottomDistance,
+      left: _sideSize(side.leftDistance),
+      top: _sideSize(side.topDistance),
+      right: _sideSize(side.rightDistance),
+      bottom: _sideSize(side.bottomDistance),
       child: GestureDetector(
         onPanStart: onStart,
         onPanUpdate: onUpdate,
@@ -29,8 +31,8 @@ class _CursorResizing extends StatelessWidget {
           cursor: side.cursor,
           opaque: true,
           child: SizedBox(
-            width: side.width,
-            height: side.height,
+            width: _sideSize(side.width),
+            height: _sideSize(side.height),
           ),
         ),
       ),

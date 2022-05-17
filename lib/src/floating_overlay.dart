@@ -118,7 +118,7 @@ class _FloatingOverlayState extends State<FloatingOverlay> with RouteAware {
         return LayoutBuilder(
           key: key,
           builder: (context, constraints) {
-            WidgetsBinding.instance?.addPostFrameCallback(
+            WidgetsBinding.instance.addPostFrameCallback(
               (_) => startController(context, constraints),
             );
             return widget.child ?? empty;
