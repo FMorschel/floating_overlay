@@ -1,4 +1,9 @@
 
+# 1.2.1 - 2022.05.17
+
+* Flutter 3.0 compatible.
+* Cursor detecting area configurable.
+
 # 1.2.0 - 2022.01.19
 
 * Fixed bug `Multiple widgets using the same GlobalKey`.

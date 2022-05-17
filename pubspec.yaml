@@ -1,12 +1,12 @@
 name: floating_overlay
 description: A widget wrapper that allows a floating widget be dragged and rescaled.
-version: 1.2.0
+version: 1.2.1
 homepage: https://github.com/FMorschel/floating_overlay
 repository: https://github.com/FMorschel/floating_overlay
 issue_tracker: https://github.com/FMorschel/floating_overlay/issues
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.17.0 <3.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
