@@ -9,6 +9,7 @@ void main() {
 
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     // Create one of this and pass it to the FloatingOverlay, to be able to pop
@@ -23,7 +24,7 @@ class App extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: Provider<RouteObserver>(
-        // One way to make it avaliable through all your files and pages, but
+        // One way to make it available through all your files and pages, but
         // global variables and other means will work just fine as well.
         create: (_) => routeObserver,
         child: const HomePage(),
@@ -53,6 +54,10 @@ class HomePage extends StatelessWidget {
         // Passing the RouteObserver created at line 17 as a parameter, will
         // make so that when you push pages on top of this one, the floating
         // child will vanish and reappear when you return.
+
+        // In order to work with Web refresh a UniqueKey needs to be provided otherwise Overlay in State in the FloatingState is not refreshed
+        key: UniqueKey(),
+        // If a UniqueKey is passed the routeObserver no longer works though
         routeObserver: routeObserver,
         controller: controller,
         floatingChild: SizedBox.square(
@@ -63,6 +68,19 @@ class HomePage extends StatelessWidget {
               border: Border.all(
                 color: Colors.black,
                 width: 5.0,
+              ),
+            ),
+            child: Material(
+              child: Container(
+                height: 5,
+                padding: const EdgeInsets.all(10),
+                child: const TextField(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -166,8 +184,7 @@ class AnimationPage extends StatefulWidget {
   _AnimationPageState createState() => _AnimationPageState();
 }
 
-class _AnimationPageState extends State<AnimationPage>
-    with SingleTickerProviderStateMixin {
+class _AnimationPageState extends State<AnimationPage> with SingleTickerProviderStateMixin {
   late final AnimationController animationController;
   late final FloatingOverlayController controller;
 

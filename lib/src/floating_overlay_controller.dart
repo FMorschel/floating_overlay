@@ -112,6 +112,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   GlobalKey _key = GlobalKey();
   OverlayState? _overlay;
   OverlayEntry? _entry;
+  _Reposition? _reposition;
   Widget? _child;
 
   void _initState(
@@ -224,14 +225,18 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _logger.info('Showing entry');
     _entry = OverlayEntry(
       builder: (context) {
-        return _entryProcesWidgets;
+        return _entryProcessWidgets;
       },
     );
     _overlay?.insert(_entry!);
   }
 
-  Widget get _entryProcesWidgets {
-    return _Reposition(
+  Widget get _entryProcessWidgets {
+    if (_reposition != null) {
+      return _reposition!;
+    }
+
+    _reposition = _Reposition(
       offsetController: _offset,
       child: Stack(
         children: [
@@ -291,6 +296,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
         ],
       ),
     );
+    return _reposition!;
   }
 
   Widget get gestureDetector {
