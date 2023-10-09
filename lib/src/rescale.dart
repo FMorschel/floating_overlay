@@ -2,11 +2,10 @@ part of 'floating_overlay.dart';
 
 class _Rescale extends StatelessWidget {
   const _Rescale({
-    Key? key,
     required this.child,
     required this.scaleController,
     required this.data,
-  }) : super(key: key);
+  });
 
   final Widget child;
   final _FloatingOverlayScale scaleController;

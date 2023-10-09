@@ -1,24 +1,138 @@
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  plugins:
+    - dart_code_metrics
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  exclude:
+    - "**/generated_plugin_registrant.dart"
+  errors:
+    missing_required_param: error
+
+dart_code_metrics:
+  rules:
+    - double-literal-format
+    - format-comment
+    - member-ordering-extended:
+        alphabetize: false
+        order:
+          - constructors
+          - named-constructors
+          - factory-constructors
+          - static-getters-setters
+          - static-const-public-fields
+          - static-const-private-fields
+          - static-final-public-fields
+          - static-final-private-fields
+          - static-late-final-public-fields
+          - static-late-final-private-fields
+          - static-late-public-fields
+          - static-late-private-fields
+          - static-public-fields
+          - static-private-fields
+          - const-public-fields
+          - const-private-fields
+          - final-public-fields
+          - final-private-fields
+          - late-final-public-fields
+          - late-final-private-fields
+          - late-public-fields
+          - late-private-fields
+          - public-fields
+          - private-fields
+          - overridden-public-fields
+          - overriden-public-methods
+          - static-public-methods
+          - static-private-methods
+          - public-methods
+          - private-methods
+          - getters-setters
+    - prefer-commenting-analyzer-ignores
+    - prefer-first
+    - prefer-immediate-return
+    - prefer-last
+
+    - always-remove-listener
+    - avoid-border-all
+    - avoid-returning-widgets:
+        ignored-names:
+          - testFunction
+        ignored-annotations:
+          - allowedAnnotation
+    - avoid-unnecessary-setstate
+    - avoid-wrapping-in-padding
+    - prefer-const-border-radius
+
 linter:
   rules:
     always_declare_return_types: true
+    always_put_required_named_parameters_first: true
     always_require_non_null_named_parameters: true
-    implicit-casts: true
-    implicit-dynamics: true
+    avoid_double_and_int_checks: true
+    avoid_dynamic_calls: true
+    avoid_empty_else: true
+    avoid_multiple_declarations_per_line: true
+    avoid_positional_boolean_parameters: true
+    avoid_slow_async_io: true
+    avoid_types_on_closure_parameters: true
+    avoid_unused_constructor_parameters: true
+    cancel_subscriptions: true
+    close_sinks: true
+    directives_ordering: true
+    empty_constructor_bodies: true
+    eol_at_end_of_file: true
+    exhaustive_cases: true
+    join_return_with_assignment: true
+    leading_newlines_in_multiline_strings: true
+    noop_primitive_operations: true
+    prefer_collection_literals: true
     prefer_final_in_for_each: true
     prefer_final_locals: true
+    prefer_for_elements_to_map_fromIterable: true
     prefer_function_declarations_over_variables: true
+    prefer_inlined_adds: true
+    prefer_int_literals: true
     prefer_is_empty: true
     prefer_is_not_empty: true
+    prefer_is_not_operator: true
+    prefer_iterable_whereType: true
+    prefer_null_aware_method_calls: true
+    prefer_null_aware_operators: true
     prefer_relative_imports: true
+    prefer_single_quotes: true
+    prefer_spread_collections: true
+    prefer_typing_uninitialized_variables: true
+    prefer_void_to_null: true
     require_trailing_commas: true
+    sized_box_shrink_expand: true
     sort_constructors_first: true
     sort_unnamed_constructors_first: true
+    type_init_formals: true
+    unawaited_futures: true
+    unnecessary_constructor_name: true
+    unnecessary_getters_setters: true
+    unnecessary_lambdas: true
+    unnecessary_late: true
     unnecessary_new: true
-    prefer_void_to_null: true
+    unnecessary_null_aware_assignments: true
+    unnecessary_null_in_if_null_operators: true
+    unnecessary_parenthesis: true
+    unnecessary_statements: true
+    unnecessary_this: true
+    use_colored_box: true
+    use_decorated_box: true
+    use_enums: true
+    use_function_type_syntax_for_parameters: true
+    use_if_null_to_convert_nulls_to_bools: true
+    use_is_even_rather_than_modulo: true
+    use_late_for_private_fields_and_variables: true
+    use_named_constants: true
+    use_setters_to_change_properties: true
+    use_string_buffers: true
+    use_super_parameters: true
+    use_test_throws_matchers: true
+    use_to_and_as_if_applicable: true
     void_checks: true
-
-analyzer:
-  errors:
-    missing_required_param: error

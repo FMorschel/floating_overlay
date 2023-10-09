@@ -18,11 +18,14 @@ class _FloatingOverlayCursor {
   /// E.g. `_Side.topLeft`?
   /// It's going to return where the mouse has gone further.
   ///
-  /// `final delta = newOffset - _offset._startOffset`
-  ///
-  /// `if (delta.dx.abs() > delta.dy.abs()) return Offset(X.Y, 0.0)`
-  ///
-  /// `else return Offset(0.0, X.Y)`
+  /// ```dart
+  /// final delta = newOffset - _offset._startOffset;
+  /// if (delta.dx.abs() > delta.dy.abs()) {
+  ///   return Offset(X.Y, 0.0);
+  /// } else {
+  ///   return Offset(0.0, X.Y);
+  /// }
+  /// ```
   Offset mainDirectionDelta(Offset newOffset, _Side side) {
     final delta = newOffset - _offset._startOffset;
     if (side.diagonal) {

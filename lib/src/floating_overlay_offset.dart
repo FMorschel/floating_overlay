@@ -44,6 +44,7 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
     onEnd();
   }
 
+  // ignore: use_setters_to_change_properties, helps to keep the api clean.
   void onStart(Offset newOffset) => _startOffset = newOffset;
 
   void onEnd() => _previousOffset = state;
@@ -75,7 +76,7 @@ class _FloatingOverlayOffset extends Cubit<Offset> {
 
   /// Updates the offset by the given Offset delta.
   void onUpdateDelta(Offset delta, Size size) {
-    final offset = (_previousOffset + delta);
+    final offset = _previousOffset + delta;
     emit(_validValue(offset, size));
   }
 

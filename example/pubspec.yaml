@@ -15,6 +15,7 @@ dependencies:
   floating_overlay: 
     path: ../
   provider: any
+  logging: any
   
 
 dev_dependencies:

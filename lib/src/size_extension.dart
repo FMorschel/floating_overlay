@@ -3,7 +3,7 @@ part of 'floating_overlay.dart';
 extension _SizeExtension on Size {
   /// Gives the lowest scale between this and [other] height and width.
   ///
-  /// e.g. this.height / other.height
+  /// E.g. `this.height / other.height`.
   double div(Size other) {
     const infinity = double.infinity;
     final heightScale =
@@ -14,9 +14,7 @@ extension _SizeExtension on Size {
 
   /// Returns this size clamped to be in the range lowerLimit-upperLimit.
   ///
-  /// The arguments lowerLimit and upperLimit must form a valid range where
-  /// `(lowerLimit.height < upperLimit.height) && (lowerLimit.width <
-  /// upperLimit.width)`.
+  /// The arguments lowerLimit and upperLimit must form a valid range.
   Size clamp(Size lowerLimit, Size upperLimit) {
     assert(lowerLimit.height < upperLimit.height);
     assert(lowerLimit.width < upperLimit.width);

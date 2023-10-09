@@ -24,7 +24,11 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
 
     /// Cursor detection pixel area.
     double? cursorArea,
+
+    /// The prototype for the floating child base size.
+    Widget? prototype,
   })  : _cursorArea = cursorArea,
+        _prototype = prototype,
         _offset = _FloatingOverlayOffset(
           start: start,
           padding: padding,
@@ -37,7 +41,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
         super(
           FloatingOverlayData(
             childSize: Size.zero,
-            scale: 1.0,
+            scale: 1,
             position: _FloatingOverlayOffset(
               start: start,
               padding: padding,
@@ -71,7 +75,11 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
 
     /// Cursor detection pixel area.
     double? cursorArea,
+
+    /// The prototype for the floating child base size.
+    Widget? prototype,
   })  : _cursorArea = cursorArea,
+        _prototype = prototype,
         _offset = _FloatingOverlayOffset(
           start: start,
           padding: padding,
@@ -84,7 +92,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
         super(
           FloatingOverlayData(
             childSize: Size.zero,
-            scale: 1.0,
+            scale: 1,
             position: _FloatingOverlayOffset(
               start: start,
               padding: padding,
@@ -96,11 +104,11 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   }
 
   void _streamProcess() {
-    _offset.stream.listen((offset) {
-      emit(state.copyWith(position: offset));
+    _offsetSubscription = _offset.stream.listen((offset) {
+      if (!_isDisposed) emit(state.copyWith(position: offset));
     });
-    _scale.stream.listen((scale) {
-      emit(state.copyWith(scale: scale));
+    _scaleSubscription = _scale.stream.listen((scale) {
+      if (!_isDisposed) emit(state.copyWith(scale: scale));
     });
   }
 
@@ -109,7 +117,11 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   final _FloatingOverlayOffset _offset;
   final _FloatingOverlayScale _scale;
   final double? _cursorArea;
+  final Widget? _prototype;
+  late final StreamSubscription<Offset> _offsetSubscription;
+  late final StreamSubscription<double> _scaleSubscription;
   GlobalKey _key = GlobalKey();
+  bool _isDisposed = false;
   OverlayState? _overlay;
   OverlayEntry? _entry;
   Widget? _child;
@@ -128,21 +140,32 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     _offset.setGlobal(_offset.state, state);
   }
 
-  void _dispose() {
-    hide(true);
-    _offset.close();
-    _scale.close();
+  @override
+  Future<void> close() async {
+    if (_isDisposed) return;
+    _logger.info('Closed');
+    _isDisposed = true;
+    await _offsetSubscription.cancel();
+    await _offset.close();
+    await _scaleSubscription.cancel();
+    await _scale.close();
+    _hide(dispose: true);
     _overlay = null;
-    _logger.info('Disposed');
+    return super.close();
   }
 
   void _createInvisibleChild(VoidCallback postFrameCallback) {
-    _logger.info('Creating invisible entry');
+    _logger.info(
+      'Creating invisible ${_prototype == null ? 'entry' : 'prototype'}',
+    );
     _entry = OverlayEntry(
       builder: (context) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           postFrameCallback();
-          _logger.info('Destroying invisible entry');
+          _logger.info(
+            'Destroying invisible '
+            '${_prototype == null ? 'entry' : 'prototype'}',
+          );
           hide();
         });
         return Offstage(
@@ -150,7 +173,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
           child: SizedBox.shrink(
             child: FittedBox(
               fit: BoxFit.scaleDown,
-              child: _floatingChild,
+              child: _floatingPrototype,
             ),
           ),
         );
@@ -161,7 +184,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
 
   void _startChildSize() {
     _logger.info('Strating child size');
-    emit(state.copyWith(childSize: _childSize));
+    if (!_isDisposed) emit(state.copyWith(childSize: _childSize));
   }
 
   Size get _childSize {
@@ -209,7 +232,9 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   }
 
   // Hides the floating child.
-  void hide([bool dispose = false]) {
+  void hide() => _hide();
+
+  void _hide({bool dispose = false}) {
     _entry?.remove();
     if (dispose) _entry?.dispose();
     _entry = null;
@@ -316,6 +341,14 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
     return Container(
       key: _key,
       child: _child ?? const SizedBox.shrink(),
+    );
+  }
+
+  Widget get _floatingPrototype {
+    _key = GlobalKey();
+    return Container(
+      key: _key,
+      child: _prototype ?? _child ?? const SizedBox.shrink(),
     );
   }
 }

@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:floating_overlay/floating_overlay.dart';
+import 'package:logging/logging.dart';
 
 import 'package:provider/provider.dart';
 
@@ -7,8 +11,29 @@ void main() {
   runApp(const App());
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  late final StreamSubscription<LogRecord> _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    Logger.root.level = Level.ALL;
+    _subscription = Logger.root.onRecord.listen(_listener);
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     // Create one of this and pass it to the FloatingOverlay, to be able to pop
@@ -30,20 +55,47 @@ class App extends StatelessWidget {
       ),
     );
   }
+
+  void _listener(LogRecord record) {
+    log(
+      record.message,
+      level: record.level.value,
+      name: record.loggerName,
+      time: record.time,
+      sequenceNumber: record.sequenceNumber,
+      stackTrace: record.stackTrace,
+      error: record.error,
+      zone: record.zone,
+    );
+  }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final controller = FloatingOverlayController.absoluteSize(
+    prototype: const SizedBox.square(dimension: 100.0),
+    padding: const EdgeInsets.all(20.0),
+    maxSize: const Size(200, 200),
+    minSize: const Size(100, 100),
+    constrained: true,
+  );
+
+  late RouteObserver<Route<dynamic>> routeObserver;
+
+  @override
+  void didChangeDependencies() {
+    routeObserver = Provider.of<RouteObserver>(context, listen: false);
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = FloatingOverlayController.absoluteSize(
-      maxSize: const Size(200, 200),
-      minSize: const Size(100, 100),
-      padding: const EdgeInsets.all(20.0),
-      constrained: true,
-    );
-    final routeObserver = Provider.of<RouteObserver>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Floating Overlay Example'),
@@ -102,22 +154,6 @@ class HomePage extends StatelessWidget {
                   );
                 },
               ),
-              CustomButton(
-                title: 'New Page with AnimationController',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => Provider<RouteObserver>(
-                        // There is a difference to initializing the
-                        // controller inside a Stateful Widget that has an
-                        // [AnimationController].
-                        create: (_) => routeObserver,
-                        child: const AnimationPage(),
-                      ),
-                    ),
-                  );
-                },
-              ),
             ],
           ),
         ),
@@ -155,93 +191,6 @@ class NewPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('New Page'), centerTitle: true),
-    );
-  }
-}
-
-class AnimationPage extends StatefulWidget {
-  const AnimationPage({Key? key}) : super(key: key);
-
-  @override
-  _AnimationPageState createState() => _AnimationPageState();
-}
-
-class _AnimationPageState extends State<AnimationPage>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController animationController;
-  late final FloatingOverlayController controller;
-
-  @override
-  void initState() {
-    animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    );
-
-    /// The [FloatingOverlayController] needs to be initialized only once when
-    /// there is an [AnimationController] inside the same State.
-    controller = FloatingOverlayController.absoluteSize(
-      maxSize: const Size(200, 200),
-      minSize: const Size(100, 100),
-      padding: const EdgeInsets.all(20.0),
-      constrained: true,
-    );
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Floating Overlay Example'),
-        centerTitle: true,
-      ),
-      body: FloatingOverlay(
-        // Passing the RouteObserver created at line 17 as a parameter, will
-        // make so that when you push pages on top of this one, the floating
-        // child will vanish and reappear when you return.
-        routeObserver: Provider.of<RouteObserver>(context, listen: false),
-        controller: controller,
-        floatingChild: SizedBox.square(
-          dimension: 100.0,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              border: Border.all(
-                color: Colors.black,
-                width: 5.0,
-              ),
-            ),
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  child: const Text('Toggle Overlay'),
-                  onPressed: () {
-                    controller.toggle();
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  child: const Text('New Page'),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => const NewPage()),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
