@@ -8,7 +8,7 @@ class _FloatingOverlayScale extends Cubit<double> {
         _maxScale = maxScale ?? 1.0,
         _maxSize = null,
         _minSize = null,
-        super(1.0);
+        super(1);
 
   _FloatingOverlayScale.absolute({
     Size? minSize,
@@ -17,14 +17,16 @@ class _FloatingOverlayScale extends Cubit<double> {
         _minSize = minSize,
         _minScale = minSize == null ? 1.0 : null,
         _maxScale = maxSize == null ? 1.0 : null,
-        super(1.0);
+        super(1);
 
   final double? _maxScale;
   final double? _minScale;
   final Size? _minSize;
   final Size? _maxSize;
-  double _previousScale = 1.0;
-  Size? _sizeLimit;
+
+  late Size _sizeLimit;
+
+  double _previousScale = 1;
 
   void init(Rect constraints) {
     final height = constraints.bottom - constraints.top;
@@ -51,7 +53,7 @@ class _FloatingOverlayScale extends Cubit<double> {
     final childSize = data.childSize;
     final minSize = _minSize ?? (childSize * (_minScale ?? 1.0));
     final maxSize = _maxSize ?? (childSize * (_maxScale ?? 1.0));
-    final actualMax = maxSize.clamp(Size.zero, _sizeLimit!);
+    final actualMax = maxSize.clamp(Size.zero, _sizeLimit);
     final clampedSize = (childSize * (_previousScale * scale)).clamp(
       minSize,
       actualMax,

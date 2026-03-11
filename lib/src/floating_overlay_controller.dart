@@ -24,7 +24,11 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
 
     /// Cursor detection pixel area.
     double? cursorArea,
-  })  : _cursorArea = cursorArea,
+
+    /// The prototype to use when building the floating child.
+    Widget? prototype,
+  })  : _prototype = prototype,
+        _cursorArea = cursorArea,
         _offset = _FloatingOverlayOffset(
           start: start,
           padding: padding,
@@ -37,7 +41,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
         super(
           FloatingOverlayData(
             childSize: Size.zero,
-            scale: 1.0,
+            scale: 1,
             position: _FloatingOverlayOffset(
               start: start,
               padding: padding,
@@ -71,7 +75,11 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
 
     /// Cursor detection pixel area.
     double? cursorArea,
-  })  : _cursorArea = cursorArea,
+
+    /// The prototype to use when building the floating child.
+    Widget? prototype,
+  })  : _prototype = prototype,
+        _cursorArea = cursorArea,
         _offset = _FloatingOverlayOffset(
           start: start,
           padding: padding,
@@ -84,7 +92,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
         super(
           FloatingOverlayData(
             childSize: Size.zero,
-            scale: 1.0,
+            scale: 1,
             position: _FloatingOverlayOffset(
               start: start,
               padding: padding,
@@ -105,10 +113,14 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   }
 
   static final _logger = Logger('FloatingOverlayController');
+
   late final _FloatingOverlayCursor _cursorController;
+
   final _FloatingOverlayOffset _offset;
   final _FloatingOverlayScale _scale;
   final double? _cursorArea;
+  final Widget? _prototype;
+
   GlobalKey _key = GlobalKey();
   OverlayState? _overlay;
   OverlayEntry? _entry;
@@ -129,7 +141,7 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   }
 
   void _dispose() {
-    hide(true);
+    _hide(true);
     _offset.close();
     _scale.close();
     _overlay = null;
@@ -150,7 +162,11 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
           child: SizedBox.shrink(
             child: FittedBox(
               fit: BoxFit.scaleDown,
-              child: _floatingChild,
+              child: _prototype?.apply((s) {
+                    _key = GlobalKey();
+                    return SizedBox(key: _key, child: s);
+                  }) ??
+                  _floatingChild,
             ),
           ),
         );
@@ -209,11 +225,21 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
   }
 
   // Hides the floating child.
-  void hide([bool dispose = false]) {
+  void hide() {
+    _hide();
+  }
+
+  void _hide([bool dispose = false]) {
     _entry?.remove();
     if (dispose) _entry?.dispose();
+    if (_entry != null) {
+      if (dispose) {
+        _logger.info('Entry removed with dispose');
+      } else {
+        _logger.info('Entry removed');
+      }
+    }
     _entry = null;
-    _logger.info('Entry removed');
   }
 
   // The floating child's visibility.
@@ -313,9 +339,13 @@ class FloatingOverlayController extends Cubit<FloatingOverlayData> {
 
   Widget get _floatingChild {
     _key = GlobalKey();
-    return Container(
+    return SizedBox(
       key: _key,
       child: _child ?? const SizedBox.shrink(),
     );
   }
+}
+
+extension _ObjExtension<T extends Widget> on T {
+  R apply<R extends Widget>(R Function(T self) fn) => fn(this);
 }

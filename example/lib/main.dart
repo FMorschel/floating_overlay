@@ -1,9 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:floating_overlay/floating_overlay.dart';
+import 'package:logging/logging.dart';
 
 import 'package:provider/provider.dart';
 
 void main() {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    log(record.message);
+  });
   runApp(const App());
 }
 

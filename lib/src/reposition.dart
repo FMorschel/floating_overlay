@@ -2,10 +2,9 @@ part of 'floating_overlay.dart';
 
 class _Reposition extends StatelessWidget {
   const _Reposition({
-    Key? key,
     required this.child,
     required this.offsetController,
-  }) : super(key: key);
+  });
 
   final Widget child;
   final _FloatingOverlayOffset offsetController;

@@ -2,12 +2,11 @@ part of 'floating_overlay.dart';
 
 class _CursorResizing extends StatelessWidget {
   const _CursorResizing({
-    Key? key,
     required this.side,
     required this.controller,
     required this.data,
     required this.area,
-  }) : super(key: key);
+  });
 
   final _Side side;
   final double? area;

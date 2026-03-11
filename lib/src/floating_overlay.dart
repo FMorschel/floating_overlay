@@ -1,22 +1,22 @@
-import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
-import 'package:logging/logging.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
+part 'cursor_border_side.dart';
+part 'cursor_resizing.dart';
 part 'floating_overlay_controller.dart';
 part 'floating_overlay_cursor.dart';
+part 'floating_overlay_data.dart';
 part 'floating_overlay_offset.dart';
 part 'floating_overlay_scale.dart';
-part 'floating_overlay_data.dart';
 part 'reposition.dart';
 part 'rescale.dart';
-part 'cursor_resizing.dart';
 part 'size_extension.dart';
-part 'cursor_border_side.dart';
 
 class FloatingOverlay extends StatefulWidget {
   const FloatingOverlay({
-    Key? key,
+    super.key,
 
     /// The child underneath this widget inside the widget tree.
     this.child,
@@ -31,7 +31,7 @@ class FloatingOverlay extends StatefulWidget {
     /// when you return if you give it an RouteObserver linked to the main
     /// MaterialApp.
     this.routeObserver,
-  }) : super(key: key);
+  });
 
   /// The child underneath this widget inside the widget tree.
   final Widget? child;
